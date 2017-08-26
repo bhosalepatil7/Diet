@@ -1,0 +1,26 @@
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\Diet.Business.Model\bin\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\Diet.Business.Model\obj\Debug\Diet.Business.Model.csprojResolveAssemblyReference.cache
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb
+C:\inetpub\wwwroot\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.dll
+C:\inetpub\wwwroot\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
+C:\inetpub\wwwroot\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
+C:\inetpub\wwwroot\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.csprojResolveAssemblyReference.cache
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb

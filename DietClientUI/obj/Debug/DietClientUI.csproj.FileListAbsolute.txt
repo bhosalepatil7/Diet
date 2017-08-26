@@ -1,0 +1,129 @@
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\DietClientUI.exe.config
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\DietClientUI.exe
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\DietClientUI.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.Business.Core.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\evohtmltopdf.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.Business.Core.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\bin\Debug\evointernal.dat
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\obj\Debug\DietClientUI.csprojResolveAssemblyReference.cache
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\obj\Debug\DietClientUI.Form1.resources
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\obj\Debug\DietClientUI.frmDiet.resources
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\obj\Debug\DietClientUI.Properties.Resources.resources
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\obj\Debug\DietClientUI.csproj.GenerateResource.Cache
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\obj\Debug\DietClientUI.exe
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\DietClientUI\obj\Debug\DietClientUI.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\DietClientUI.exe.config
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.exe
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\DietClientUI.exe
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\DietClientUI.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.Business.Contract.dll
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.Business.Core.dll
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\evohtmltopdf.dll
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.dll
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.Business.Contract.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.Business.Core.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.pdb
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\bin\Debug\evointernal.dat
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.csprojResolveAssemblyReference.cache
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.DietMasterPage.resources
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.Form1.resources
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.frmDiet.resources
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.Properties.Resources.resources
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.WelcomeScreen.resources
+D:\Intrepidians\Diet Project\Diet_20151222\Diet_20151222\DietClientUI\obj\Debug\DietClientUI.csproj.GenerateResource.Cache
+C:\Users\PATIL\Documents\Visual Studio 2013\WebSites\Diet\DietClientUI\bin\Debug\DietClientUI.exe.config
+C:\Users\PATIL\Documents\Visual Studio 2013\WebSites\Diet\DietClientUI\obj\Debug\DietClientUI.exe
+C:\Users\PATIL\Documents\Visual Studio 2013\WebSites\Diet\DietClientUI\obj\Debug\DietClientUI.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\DietClientUI.exe.config
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\DietClientUI.exe
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\DietClientUI.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.dll
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.Business.Core.dll
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.Business.Model.dll
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\evohtmltopdf.dll
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.dll
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.Business.Core.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.Business.Model.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.pdb
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\bin\Debug\evointernal.dat
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.csprojResolveAssemblyReference.cache
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.DietMasterPage.resources
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.Form1.resources
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.frmDiet.resources
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.Properties.Resources.resources
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.WelcomeScreen.resources
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.csproj.GenerateResource.Cache
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.exe
+C:\Users\ckakdep\Desktop\Interpidians\POC\Subhash\Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.pdb
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\DietClientUI.exe.config
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\DietClientUI.exe
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\DietClientUI.pdb
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.dll
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.Business.Core.dll
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.Business.Model.dll
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\evohtmltopdf.dll
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.dll
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.pdb
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.Business.Core.pdb
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.Business.Model.pdb
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.pdb
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\bin\Debug\evointernal.dat
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.csprojResolveAssemblyReference.cache
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.DietMasterPage.resources
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.Form1.resources
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.frmDiet.resources
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.Properties.Resources.resources
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.WelcomeScreen.resources
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.csproj.GenerateResource.Cache
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.exe
+C:\Users\PATIL\Downloads\Compressed\Diet_20160124\Diet\DietClientUI\obj\Debug\DietClientUI.pdb
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\DietClientUI.exe.config
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\DietClientUI.exe
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\DietClientUI.pdb
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.dll
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.Business.Core.dll
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.Business.Model.dll
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\evohtmltopdf.dll
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.dll
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.pdb
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.Business.Core.pdb
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.Business.Model.pdb
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.pdb
+C:\inetpub\wwwroot\Diet\DietClientUI\bin\Debug\evointernal.dat
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.csprojResolveAssemblyReference.cache
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.DietMasterPage.resources
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.Form1.resources
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.frmDiet.resources
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.Properties.Resources.resources
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.WelcomeScreen.resources
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.csproj.GenerateResource.Cache
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.exe
+C:\inetpub\wwwroot\Diet\DietClientUI\obj\Debug\DietClientUI.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\DietClientUI.exe.config
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\DietClientUI.exe
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\DietClientUI.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.Business.Core.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\evohtmltopdf.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.Business.Core.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\Diet.DataAccess.DataManagers.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\bin\Debug\evointernal.dat
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\obj\Debug\DietClientUI.csprojResolveAssemblyReference.cache
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\obj\Debug\DietClientUI.Properties.Resources.resources
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\obj\Debug\DietClientUI.csproj.GenerateResource.Cache
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\obj\Debug\DietClientUI.exe
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\obj\Debug\DietClientUI.pdb

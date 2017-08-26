@@ -1,0 +1,28 @@
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.dll
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.pdb
+C:\Users\ckakdep\Documents\Visual Studio 2013\Projects\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.csprojResolveAssemblyReference.cache
+C:\inetpub\wwwroot\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.dll
+C:\inetpub\wwwroot\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.pdb
+C:\inetpub\wwwroot\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.dll
+C:\inetpub\wwwroot\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.pdb
+C:\inetpub\wwwroot\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.csprojResolveAssemblyReference.cache
+C:\inetpub\wwwroot\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.dll
+C:\inetpub\wwwroot\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.pdb
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.dll
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.pdb
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.dll
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.pdb
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.csprojResolveAssemblyReference.cache
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.dll
+C:\Users\ckakdep\Desktop\Subhash-GNH\Diet_20160421_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.csprojResolveAssemblyReference.cache
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.dll
+D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.pdb

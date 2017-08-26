@@ -1,0 +1,58 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="PrintForm.aspx.cs" Inherits="GNHClientUI.PrintForm" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <script src="../assets/js/jquery.js"></script>
+    <style type="text/css">
+        .auto-style1 {
+            width: 200px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                type: "POST",
+                url: 'HistoryHelper.aspx/GetPrintDetails',
+                data: JSON.stringify({ FileName: $(<%=hdnFileName.ClientID%>).val() }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $('div[id="divContent"]').html(data.d[0]);
+                },
+                error: function (data) {
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <asp:HiddenField runat="server" ID="hdnFileName" />
+        <div id="ReportData">
+            <table style=""">
+                <tr>
+                    <td>
+                        </td>
+                    <img src="../Images/Logo.jpg" />
+                    <td class="auto-style1"></td>
+                    <td>Right Nutrition for Health</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div id="divContent"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">+91 7722 0070 68 | info@geetanutriheal.com |www.geetanutriheal.com</td>
+                </tr>
+            </table>
+        </div>
+        <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Button" />
+    </form>
+</body>
+</html>
+
