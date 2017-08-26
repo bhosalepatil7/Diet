@@ -7,15 +7,13 @@
         .table {
             border-bottom: 0px !important;
         }
-
-            .table th, .table td {
+                   .table th, .table td {
                 border: 0px !important;
             }
 
         .fixed-table-container {
             border: 0px !important;
         }
-
         .nopadding {
             padding: 2px !important;
             margin: 2px !important;
