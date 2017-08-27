@@ -8,6 +8,7 @@ using Diet.Business.Core.ModDashboard;
 using System.Globalization;
 using System.Data;
 using Diet.Business.Core.ModDietMaster;
+using Diet.DataAccess.DataManagers.ModHelper;
 
 namespace GNHClientUI
 {
@@ -36,7 +37,7 @@ namespace GNHClientUI
                 DataRowView drview = e.Row.DataItem as DataRowView;
                 //   dt = DateTime.ParseExact(drview[4].ToString(), "h:mmtt", CultureInfo.InvariantCulture);
                 Label l = ((Label)e.Row.FindControl("lblDiff"));
-                if (Convert.ToString(Session["GROUPID"]).Trim().Equals("RESEARCH DOCTOR") || Convert.ToString(Session["GROUPID"]).Trim().Equals("SUPERIOR DOCTOR"))
+                if (Convert.ToString(new HelperMasterDataManager().CheckAccess(Convert.ToString(Session["UserCode"])).Rows[0][0]).Equals("TRUE"))
                 {
                     ((Button)e.Row.FindControl("btnMark")).Visible = true;
                     ((Button)e.Row.FindControl("btnMark")).CssClass = "btn btn-info";
@@ -99,7 +100,7 @@ namespace GNHClientUI
 
 
                 Label l = ((Label)e.Row.FindControl("lblonoff"));
-                if (Convert.ToString(Session["GROUPID"]).Trim().Equals("RESEARCH DOCTOR") || Convert.ToString(Session["GROUPID"]).Trim().Equals("SUPERIOR DOCTOR"))
+                if (Convert.ToString(new HelperMasterDataManager().CheckAccess(Convert.ToString(Session["UserCode"])).Rows[0][0]).Equals("TRUE"))
                 {
                     ((Button)e.Row.FindControl("btnVisit")).Enabled = true;
                     ((Button)e.Row.FindControl("btnVisit")).CssClass = "btn btn-danger";

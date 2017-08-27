@@ -39,5 +39,20 @@ namespace Diet.DataAccess.DataManagers.ModHelper
                 throw;
             }
         }
+        public DataTable CheckAccess(string session)
+        {
+            try
+            {
+                SqlParameter[] parameter = new SqlParameter[]
+                {
+                    new SqlParameter("@Session",session)                    
+                };
+                return DBOperate.GetDataTable("usp_CheckAccess", parameter);
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

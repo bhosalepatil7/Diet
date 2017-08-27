@@ -111,9 +111,11 @@ Partial Class Master_MasterPage2
             Response.Cookies("ASP.NET_SessionId").Expires = DateTime.UtcNow.AddHours(5.5).AddMonths(-20)
         End If
         FormsAuthentication.SignOut()
-        'Response.Redirect("../Master/index.aspx")
+
         Response.Cookies.Clear()
+        'Threading.Thread.Sleep(3000)
         Response.Redirect(acs.mapLink(Request.Path))
+        'Response.Redirect("../Master/index.aspx")
     End Sub
 
     Private Sub BindMenu()
@@ -388,6 +390,41 @@ Partial Class Master_MasterPage2
 
     Protected Sub lnkProfile_Click(sender As Object, e As EventArgs)
         'Server.Transfer("../MASTER/Home.aspx")
+    End Sub
+
+    Protected Sub lnk_logout_Click1(sender As Object, e As EventArgs)
+        If CONN.State = ConnectionState.Closed Then CONN.Open()
+        cmd.CommandText = "UPDATE SESSION_TRACKING_LOG SET LOGOUTAT = dateadd(minute,330,getutcdate()) WHERE LOGINAT = (SELECT MAX(LOGINAT) FROM SESSION_TRACKING_LOG WHERE UPPER(USERNAME)=UPPER(@USER_NAME) ) AND LOGOUTAT IS NULL"
+
+        cmd.Parameters.Add(prmUSER_NAME)
+        prmUSER_NAME.Value = Session("UserCode")
+        cmd.Connection = CONN
+        cmd.ExecuteNonQuery()
+        If Not Session("Uname") Is Nothing Then
+            Dim j As String
+            j = Session("Uname")
+            Session.Abandon()
+            Session("SelectedNode") = ""
+            Response.Cookies.Add(New HttpCookie("ASP.NET_SessionId", ""))
+            Session.Clear()
+            Session("Uname") = j
+        End If
+        Session("UserCode") = ""
+        Session("SelectedNode") = ""
+
+        '=====Added by Milan=====
+        Session.Clear()
+        Session.Abandon()
+        Session.RemoveAll()
+
+        If Request.Cookies("ASP.NET_SessionId") IsNot Nothing Then
+            Response.Cookies("ASP.NET_SessionId").Value = String.Empty
+            Response.Cookies("ASP.NET_SessionId").Expires = DateTime.UtcNow.AddHours(5.5).AddMonths(-20)
+        End If
+        FormsAuthentication.SignOut()
+        'Response.Redirect("../Master/index.aspx")
+        Response.Cookies.Clear()
+        Response.Redirect(acs.mapLink(Request.Path))
     End Sub
 End Class
 

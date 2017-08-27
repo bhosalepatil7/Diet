@@ -398,7 +398,7 @@
                                     Logout
                                 </a>--%>
                                 <asp:LinkButton CssClass="DDFloatRights " class="logout" ID="lnk_logout" runat="server"
-                                    Font-Bold="True" Font-Names="Arial" Font-Size="12px" ForeColor="#205082" CausesValidation="False">Logout</asp:LinkButton>
+                                    Font-Bold="True" Font-Names="Arial" Font-Size="12px" ForeColor="#205082" CausesValidation="False" OnClick="lnk_logout_Click1">Logout</asp:LinkButton>
                             </li>
                         </ul>
                     </li>
