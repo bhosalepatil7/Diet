@@ -6,8 +6,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder3" runat="server">
     <link href="../css/intlTelInput.css" rel="stylesheet" />
     <script src="../assets/js/jquery.js"></script>
-    <script src="../Scripts/intlTelInput.js?v=2017082401"></script>
-    <script src="../Scripts/isValidNumber.js?v=2017082401"></script>
+    <script src="../Scripts/phone-format.js?v=2017082606"></script>   
     <script src="../assets/js/jquery-ui.custom.js"></script>
     <script src="../assets/js/jquery.ui.touch-punch.js"></script>
     <script src="../assets/js/chosen.jquery.js"></script>
@@ -18,6 +17,7 @@
     <script src="../assets/js/jquery.maskedinput.js"></script>
     <script src="../assets/js/jquery.addnew.js"></script>
     <script src="../Scripts/gnh-converter.js"></script>
+
     <style type="text/css">
         .table {
             border-bottom: 0px !important;
@@ -371,16 +371,37 @@
                 });
             };
         });
-
         function ValidateMobileOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            debugger;
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            args.IsValid = isValidNumberForRegion(txtMobile.val(), aCountryCode);
         }
 
         function ValidateLandlineOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+            args.IsValid = isValidNumberForRegion(txtLandline.val(), aCountryCode);
         }
+
+        function SetExampleMobileLandlineNumber() {
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+
+            txtMobile.attr('placeholder', exampleMobileNumber(aCountryCode));
+            txtLandline.attr('placeholder', exampleLandlineNumber(aCountryCode));
+        }
+
+        function pageLoad(sender, args) {
+            $(document).ready(function () {
+                SetExampleMobileLandlineNumber();
+            });
+        }
+
 
 
         function SetTabs() {
@@ -1086,7 +1107,7 @@ function IBW() {
                                             <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
-                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit" OnServerValidate="MobileNumberValidate"></asp:CustomValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1097,7 +1118,7 @@ function IBW() {
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
                                         <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
-                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit" OnServerValidate="LandlineNumberValidate"></asp:CustomValidator>
 
                                     </div>
                                 </div>

@@ -44,6 +44,6 @@ D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\bin\Debug
 D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\bin\Debug\Diet.DataAccess.DataManagers.pdb
 D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\bin\Debug\Diet.Business.Model.dll
 D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\bin\Debug\Diet.Business.Model.pdb
-D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\obj\Debug\Diet.DataAccess.DataManagers.csprojResolveAssemblyReference.cache
 D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\obj\Debug\Diet.DataAccess.DataManagers.dll
 D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\obj\Debug\Diet.DataAccess.DataManagers.pdb
+D:\Intrepidians\Diet Project\Project\Diet\Diet.DataAccess.DataManagers\obj\Debug\Diet.DataAccess.DataManagers.csprojResolveAssemblyReference.cache

@@ -128,8 +128,6 @@ D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\o
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\obj\Debug\DietClientUI.exe
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\DietClientUI\obj\Debug\DietClientUI.pdb
 D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\bin\Debug\DietClientUI.exe.config
-D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.exe
-D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.pdb
 D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\bin\Debug\DietClientUI.exe
 D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\bin\Debug\DietClientUI.pdb
 D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\bin\Debug\Diet.Business.Contract.dll
@@ -145,3 +143,5 @@ D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\bin\Debug\evointernal.dat
 D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.csprojResolveAssemblyReference.cache
 D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.Properties.Resources.resources
 D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.csproj.GenerateResource.Cache
+D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.exe
+D:\Intrepidians\Diet Project\Project\Diet\DietClientUI\obj\Debug\DietClientUI.pdb

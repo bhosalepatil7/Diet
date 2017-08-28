@@ -37,6 +37,12 @@ function addFoodRow(MealId) {
         }
     });
 
+    if (foodNutrients.foodID == "-1")
+    {
+        $(containerRecallDiet + "#txtFoodItem" + MealId).notify("Food does not exist", { position: "bottom", className: 'error' });
+        return;
+    }
+
     var obj = {
         "ROW_ID": itemCount,
         "FOOD_ID": foodNutrients.foodID,
@@ -156,6 +162,12 @@ function removeFoodRow(MealId, removeButton) {
     calculateTotal(MealId);
 }
 
+function changeRecallMealTime(MealId) {
+    debugger;
+    saveMeal(MealId);
+    //calculateTotal(MealId); //No need to calculate total since only mealtime is changed
+}
+
 function editFoodRow(MealId, editButton) {
     debugger;
     var editableFields = $(editButton).parent().parent().parent().find('td.editable');
@@ -172,6 +184,7 @@ function editFoodRow(MealId, editButton) {
 }
 
 function calculateTotal(MealId) {
+    var weeklyTotals = [0, 0, 0, 0, 0];
     var weekdayTotals = [0, 0, 0, 0, 0];
     var weekendTotals = [0, 0, 0, 0, 0];
 
@@ -184,12 +197,21 @@ function calculateTotal(MealId) {
 
         for (var i = 0; i <= 6; i++) {
 
+            //week total
+            if (foodConsumtionDaysBits[i] == "1") {
+                $(this).find('.rowDataSd').each(function (i) {
+                    weeklyTotals[i] += parseFloat(parseFloat($(this).html()).toFixed(2));
+                });
+            }
+
+            //weekday total
             if (foodConsumtionDaysBits[i] == "1" && i <= 4) {
                 $(this).find('.rowDataSd').each(function (i) {
                     weekdayTotals[i] += parseFloat(parseFloat($(this).html()).toFixed(2));
                 });
             }
 
+            //weekend total
             if (foodConsumtionDaysBits[i] == "1" && i > 4) {
                 $(this).find('.rowDataSd').each(function (i) {
                     weekendTotals[i] += parseFloat(parseFloat($(this).html()).toFixed(2));
@@ -201,10 +223,17 @@ function calculateTotal(MealId) {
 
     });
 
+    //weekly average
+    $(containerRecallDiet + "table[id$='tblFoodList" + MealId + "'] td.totalCol.week").each(function (i) {
+        $(this).html((weeklyTotals[i] / 7).toFixed(2));
+    });
+
+    //weekday average
     $(containerRecallDiet + "table[id$='tblFoodList" + MealId + "'] td.totalCol.weekday").each(function (i) {
         $(this).html((weekdayTotals[i] / 5).toFixed(2));
     });
 
+    //weekend average
     $(containerRecallDiet + "table[id$='tblFoodList" + MealId + "'] td.totalCol.weekend").each(function (i) {
         $(this).html((weekendTotals[i] / 2).toFixed(2));
     });
@@ -407,7 +436,7 @@ function saveAllMeals() {
         length = 12;
     }
     for (var meal = 1; meal <= length; meal++) {
-        //saveMeal(mealName + meal);
+        saveMeal(mealName + meal);
     }
 
     $(containerRecallDiet + "input[id='btnSaveAllMeals']").notify(

@@ -356,8 +356,7 @@
 		<![endif]-->
 
 <script src="../assets/js/jquery.js"></script>
-<script src="../Scripts/intlTelInput.js?v=2017082401"></script>
-<script src="../Scripts/isValidNumber.js?v=2017082401"></script>
+<script src="../Scripts/phone-format.js?v=2017082601"></script>
 <script src="../assets/js/jquery-ui.custom.js"></script>
 <script src="../assets/js/jquery.ui.touch-punch.js"></script>
 <script src="../assets/js/chosen.jquery.js"></script>
@@ -377,7 +376,7 @@
 <script src="../assets/js/ace/elements.typeahead.js"></script>
 <script src="../Scripts/notify.min.js"></script>
 <!-- inline scripts related to this page -->
-<script src="../Scripts/RecallDiet.js?v=2017081801"></script>
+<script src="../Scripts/RecallDiet.js?v=2017082705"></script>
 <script>
     $(document).ready(function () {
         setDietRecallType();
@@ -424,8 +423,8 @@
         }
 
 
-        $('[data-rel=tooltip]').tooltip({ container: 'body' });
-        $('[data-rel=popover]').popover({ container: 'body' });
+        //$('[data-rel=tooltip]').tooltip({ container: 'body' });
+        //$('[data-rel=popover]').popover({ container: 'body' });
 
         $('textarea[class*=autosize]').autosize({ append: "\n" });
         $('textarea.limited').inputlimiter({
@@ -534,28 +533,28 @@
         //});
 
         // scrollables
-        $('.scrollable').each(function () {
-            var $this = $(this);
-            $(this).ace_scroll({
-                size: $this.attr('data-size') || 100,
-                //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
-            });
-        });
-        $('.scrollable-horizontal').each(function () {
-            var $this = $(this);
-            $(this).ace_scroll(
-			  {
-			      horizontal: true,
-			      styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
-			      size: $this.attr('data-size') || 500,
-			      mouseWheelLock: true
-			  }
-			).css({ 'padding-top': 12 });
-        });
+        //$('.scrollable').each(function () {
+        //    var $this = $(this);
+        //    $(this).ace_scroll({
+        //        size: $this.attr('data-size') || 100,
+        //        //styleClass: 'scroll-left scroll-margin scroll-thin scroll-dark scroll-light no-track scroll-visible'
+        //    });
+        //});
+        //$('.scrollable-horizontal').each(function () {
+        //    var $this = $(this);
+        //    $(this).ace_scroll(
+		//	  {
+		//	      horizontal: true,
+		//	      styleClass: 'scroll-top',//show the scrollbars on top(default is bottom)
+		//	      size: $this.attr('data-size') || 500,
+		//	      mouseWheelLock: true
+		//	  }
+		//	).css({ 'padding-top': 12 });
+        //});
 
-        $(window).on('resize.scroll_reset', function () {
-            $('.scrollable-horizontal').ace_scroll('reset');
-        });
+        //$(window).on('resize.scroll_reset', function () {
+        //    $('.scrollable-horizontal').ace_scroll('reset');
+        //});
 
         $(document).one('ajaxloadstart.page', function (e) {
             $('textarea[class*=autosize]').trigger('autosize.destroy');

@@ -64,7 +64,8 @@
                         <asp:DropDownList runat="server" ID="ddlSearch" OnSelectedIndexChanged="ddlSearch_SelectedIndexChanged" TabIndex="1" CssClass="form-control">
                             <asp:ListItem Selected="True">ALL</asp:ListItem>
                             <asp:ListItem>ID</asp:ListItem>
-                            <asp:ListItem>Name</asp:ListItem>
+                            <asp:ListItem>FIRSTNAME</asp:ListItem>
+                            <asp:ListItem>LASTNAME</asp:ListItem>
                             <asp:ListItem>Email</asp:ListItem>
                             <asp:ListItem>Contact</asp:ListItem>
                         </asp:DropDownList>
@@ -169,7 +170,7 @@
                             <ItemTemplate>
                                 <asp:Label ID="lblVisits" Text='<%#Eval("Visits") %>' runat="server"></asp:Label>
                                 <%--<asp:LinkButton ID="btnView" runat="server" Text="View" CausesValidation="False" CommandName="View" CommandArgument='<%# Eval("PatientID") %>'
-                                    ToolTip="View" Height="30px"></asp:LinkButton><%--|--%>--%>
+                                    ToolTip="View" Height="30px"></asp:LinkButton><%--|--%>
                                 <%-- <span onclick="return confirm('Are you sure want to mark this as visit?')">
                                     <asp:LinkButton ID="btnVisit" runat="server" Text="Mark as Visit" CausesValidation="False" CommandName="Visit" CommandArgument='<%# Eval("PatientID") %>'
                                         ToolTip="Mark as Visit" Height="30px"></asp:LinkButton></span>--%>
@@ -180,7 +181,7 @@
                 </asp:GridView>
             </div>
         </ContentTemplate>
-          <Triggers>
+        <Triggers>
             <asp:AsyncPostBackTrigger ControlID="rptAlphabets" />
         </Triggers>
     </asp:UpdatePanel>

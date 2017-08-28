@@ -6,11 +6,9 @@
 <%@ Register TagPrefix="UC" TagName="Recommend" Src="~/UserControl/RecommendedDiet.ascx" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder3" runat="Server">
     <link href="../css/intlTelInput.css" rel="stylesheet" />
-    <%--<script src="http://code.jquery.com/jquery-1.12.3.min.js"></script>--%>
+    
     <script src="../assets/js/jquery.js"></script>
-    <script src="../Scripts/intlTelInput.js?v=2017082401"></script>
-    <script src="../Scripts/isValidNumber.js?v=2017082401"></script>
-    <%--<script src="../Scripts/jquery-1.12.0.js"></script>--%>
+    <script src="../Scripts/phone-format.js?v=2017082606"></script>      
     <script src="../assets/js/jquery-ui.custom.js"></script>
     <script src="../assets/js/jquery.ui.touch-punch.js"></script>
     <script src="../assets/js/chosen.jquery.js"></script>
@@ -21,10 +19,8 @@
     <script src="../assets/js/jquery.maskedinput.js"></script>
     <script src="../assets/js/jquery.addnew.js"></script>
     <script src="../Scripts/gnh-converter.js"></script>
-    <script src="../Scripts/RecallDiet.js?v=2017081801"></script>
-    <script src="../Scripts/RecommendedDiet.js?v=2017081801"></script>
-    <%--    <script src="../Scripts/js/jquery.dateselect.js"></script>
-    <link href="../Scripts/css/jquery.dateselect.css" rel="stylesheet" type="text/css" />--%>
+    <script src="../Scripts/RecallDiet.js?v=2017082705"></script>
+    <script src="../Scripts/RecommendedDiet.js?v=2017082705"></script>
     <style type="text/css">
         .table {
             border-bottom: 0px !important;
@@ -321,24 +317,24 @@
 
             /*$("a[href$='tabs-7']").parent().replaceWith("</ul><ul>"); //hide RecallDiet Tab
 
-            //$("body").keydown(function (event) {
-            //    switch (event.which) {
-            //        case 37: //Arrow left
-            //            $('.nav-tabs > .active').prev('li').find('a').trigger('click');
-            //            break;
-            //        case 39: //Arrow left
-            //            $('.nav-tabs > .active').next('li').find('a').trigger('click');
-            //            break;
-            //    }
-            //});
-            */
+			//$("body").keydown(function (event) {
+			//    switch (event.which) {
+			//        case 37: //Arrow left
+			//            $('.nav-tabs > .active').prev('li').find('a').trigger('click');
+			//            break;
+			//        case 39: //Arrow left
+			//            $('.nav-tabs > .active').next('li').find('a').trigger('click');
+			//            break;
+			//    }
+			//});
+			*/
             $(document).keydown(function (e) {
 
                 // Set self as the current item in focus
                 var self = $(':focus'),
-                    // Set the form by the current item in focus
-                    form = self.parents('form:eq(0)'),
-                    focusable;
+					// Set the form by the current item in focus
+					form = self.parents('form:eq(0)'),
+					focusable;
 
                 // Array of Indexable/Tab-able items
                 focusable = form.find('input,a,select,button,textarea').filter(':visible');
@@ -378,18 +374,53 @@
             //$('#btnComorbidity').live('click', function (evt) { SetTabs(); });
         });
 
+
         function ValidateMobileOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            debugger;
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            args.IsValid = isValidNumberForRegion(txtMobile.val(), aCountryCode);
         }
 
         function ValidateLandlineOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+            args.IsValid = isValidNumberForRegion(txtLandline.val(), aCountryCode);
         }
+
+        function SetExampleMobileLandlineNumber() {
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+
+            txtMobile.attr('placeholder', exampleMobileNumber(aCountryCode));
+            txtLandline.attr('placeholder', exampleLandlineNumber(aCountryCode));
+        }
+
+        function pageLoad(sender, args) {
+            $(document).ready(function () {
+                SetExampleMobileLandlineNumber();
+            });
+        }
+
 
         function SetTabs() {
 
+            $("textarea").on("keydown", function (e) {
+                var key = e.keyCode;
+                debugger;
+                // If the user has pressed enter
+                if (key === 13) {
+                    $(this)[0].value = '' + $(this)[0].value + '\n';
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
             //Calling BMR Function first time
             BMR();
             if ($("[id='ContentPlaceHolder1_ContentPlaceHolder3_TabName']").val() == "") {
@@ -490,6 +521,17 @@
                         minuteStep: 1,
                         showSeconds: false,
                         showMeridian: false
+                    }).on("changeTime.timepicker", function (e) {
+                        debugger;
+                        var MealId = $(this).data().mealName;
+                        var prevMealTime = $(this).attr('data-meal-time');
+                        var newMealTime = e.time.value;
+                        //console.log('' + MealId + ' New Meal Time - ' + newMealTime + ' Old Meal Time - ' + prevMealTime);
+                        if (prevMealTime != newMealTime) {
+                            changeRecommendedMealTime(MealId);
+                            $(this).attr('data-meal-time', newMealTime);
+                            $(this).attr('value', newMealTime);
+                        }
                     }).next().on(ace.click_event, function () {
                         $(this).prev().focus();
                     });
@@ -571,12 +613,25 @@
                     });
 
                     $("#RecallDietSection input[id*='txtTimePickerMeal']").timepicker({
+                        //onSelect: function (d,i) { console.log('Hi'+i.lastVal());},
                         minuteStep: 1,
                         showSeconds: false,
                         showMeridian: false
+                    }).on("changeTime.timepicker", function (e) {
+                        debugger;
+                        var MealId = $(this).data().mealName;
+                        var prevMealTime = $(this).attr('data-meal-time');
+                        var newMealTime = e.time.value;
+                        //console.log('' + MealId + ' New Meal Time - ' + newMealTime + ' Old Meal Time - ' + prevMealTime);
+                        if (prevMealTime != newMealTime) {
+                            changeRecallMealTime(MealId);
+                            $(this).attr('data-meal-time', newMealTime);
+                            $(this).attr('value', newMealTime);
+                        }
                     }).next().on(ace.click_event, function () {
                         $(this).prev().focus();
                     });
+
 
                     ////////
                 }
@@ -603,338 +658,338 @@
             $('#tabs a[href="#' + tabName + '"]').trigger('click');
 
 
-            <%--//Datepicker
-            $('.btn-date').on('click', function (e) {
-                e.preventDefault();
-                $.dateSelect.show({
-                    element: $('#<%= txtDOB.ClientID %>')
-                });
-            });--%>
+			<%--//Datepicker
+			$('.btn-date').on('click', function (e) {
+				e.preventDefault();
+				$.dateSelect.show({
+					element: $('#<%= txtDOB.ClientID %>')
+				});
+			});--%>
 
-            $('#<%= txtDOB.ClientID %>').datepicker({
-                autoclose: true,
-                format: 'dd/mm/yyyy'
-            }).mask('99/99/9999');
-
-
-            var age = document.getElementById('<%=txtAge.ClientID %>').value;
-            if (age < 18)
-                $('div .child').css('display', 'block');
-            else
-                $('div .child').css('display', 'none');
+		    $('#<%= txtDOB.ClientID %>').datepicker({
+		        autoclose: true,
+		        format: 'dd/mm/yyyy'
+		    }).mask('99/99/9999');
 
 
-            $('#<%= ddlGender.ClientID %>').change(function () {
-                if ($(this).val() == 'Male') {
-                    $('div .gender').css('display', 'none');
-                }
-                else {
-                    $('div .gender').css('display', 'block');
-                }
-            });
+		    var age = document.getElementById('<%=txtAge.ClientID %>').value;
+		    if (age < 18)
+		        $('div .child').css('display', 'block');
+		    else
+		        $('div .child').css('display', 'none');
 
-            if ($('#<%= ddlLactatingMother.ClientID %>').val() == 'Yes') {
-                $('div .NoLactic').css('display', 'block');
-            }
-            else {
-                $('div .NoLactic').css('display', 'none');
-            }
 
-            if ($('#<%= ddlPregnant.ClientID %>').val() == 'Yes') {
-                $('div .NoPregnant').css('display', 'block');
-                $('div .NoLactic').css('display', 'block');
-            }
-            else {
-                $('div .NoPregnant').css('display', 'none');
-                $('div .NoLactic').css('display', 'none');
-            }
+		    $('#<%= ddlGender.ClientID %>').change(function () {
+			    if ($(this).val() == 'Male') {
+			        $('div .gender').css('display', 'none');
+			    }
+			    else {
+			        $('div .gender').css('display', 'block');
+			    }
+			});
 
-            if ($('#<%= ddlGender.ClientID %>').val() == 'Male')
-                $('div .gender').css('display', 'none');
-            else
-                $('div .gender').css('display', 'block');
+			if ($('#<%= ddlLactatingMother.ClientID %>').val() == 'Yes') {
+		        $('div .NoLactic').css('display', 'block');
+		    }
+		    else {
+		        $('div .NoLactic').css('display', 'none');
+		    }
 
-            if ($('#<%= ddlProfession.ClientID %>').val() == 'Other,Specify')
-                $('#<%=txtProfessionOthers.ClientID %>').css('display', 'block');
-            else
-                $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
+		    if ($('#<%= ddlPregnant.ClientID %>').val() == 'Yes') {
+		        $('div .NoPregnant').css('display', 'block');
+		        $('div .NoLactic').css('display', 'block');
+		    }
+		    else {
+		        $('div .NoPregnant').css('display', 'none');
+		        $('div .NoLactic').css('display', 'none');
+		    }
+
+		    if ($('#<%= ddlGender.ClientID %>').val() == 'Male')
+		        $('div .gender').css('display', 'none');
+		    else
+		        $('div .gender').css('display', 'block');
+
+		    if ($('#<%= ddlProfession.ClientID %>').val() == 'Other,Specify')
+		        $('#<%=txtProfessionOthers.ClientID %>').css('display', 'block');
+			else
+			    $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
 
 
             $('#<%= ddlProfession.ClientID %>').change(function () {
-                if ($(this).val() == 'Other,Specify') {
+		        if ($(this).val() == 'Other,Specify') {
 
-                    $('#<%=txtProfessionOthers.ClientID %>').css('display', 'block');
-                }
-                else {
-                    $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
-                }
-            });
+		            $('#<%=txtProfessionOthers.ClientID %>').css('display', 'block');
+				}
+				else {
+				    $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
+				}
+			});
 
             $('#<%= txtBloodPressure.ClientID %>').mask('999/999');
 
-            $('#<%= txtSleep.ClientID %>').mask('99/99');
+		    //$('#<%= txtSleep.ClientID %>').mask('99/99')
 
-            $('#<%= ddlAlcohol.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('div .NoAlcohol').css('display', 'block');
-                }
-                else {
-                    $('div .NoAlcohol').css('display', 'none');
-                }
-            });
-            if ($('#<%= ddlAlcohol.ClientID %>').val() == 'Yes')
-                $('div .NoAlcohol').css('display', 'block');
-            else
-                $('div .NoAlcohol').css('display', 'none');
+		    $('#<%= ddlAlcohol.ClientID %>').change(function () {
+		        if ($(this).val() == 'Yes') {
+		            $('div .NoAlcohol').css('display', 'block');
+		        }
+		        else {
+		            $('div .NoAlcohol').css('display', 'none');
+		        }
+		    });
+		    if ($('#<%= ddlAlcohol.ClientID %>').val() == 'Yes')
+		        $('div .NoAlcohol').css('display', 'block');
+		    else
+		        $('div .NoAlcohol').css('display', 'none');
 
-            $('#<%= ddlPregnant.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
+		    $('#<%= ddlPregnant.ClientID %>').change(function () {
+		        if ($(this).val() == 'Yes') {
 
-                    $('div .NoPregnant').css('display', 'block');
-                    $('div .NoLactic').css('display', 'block');
-                }
-                else {
-                    $('div .NoPregnant').css('display', 'none');
-                    $('div .NoLactic').css('display', 'none');
-                }
-            });
+		            $('div .NoPregnant').css('display', 'block');
+		            $('div .NoLactic').css('display', 'block');
+		        }
+		        else {
+		            $('div .NoPregnant').css('display', 'none');
+		            $('div .NoLactic').css('display', 'none');
+		        }
+		    });
 
-            $('#<%= ddlLactatingMother.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('div .NoLactic').css('display', 'block');
-                }
-                else {
-                    $('div .NoLactic').css('display', 'none');
-                }
-            });
-            if ($('#<%= ddlThyroid.ClientID %>').val() == 'No')
-                $('div .NoThyroid').css('display', 'none');
-            else
-                $('div .NoThyroid').css('display', 'block');
+		    $('#<%= ddlLactatingMother.ClientID %>').change(function () {
+		        if ($(this).val() == 'Yes') {
+		            $('div .NoLactic').css('display', 'block');
+		        }
+		        else {
+		            $('div .NoLactic').css('display', 'none');
+		        }
+		    });
+		    if ($('#<%= ddlThyroid.ClientID %>').val() == 'No')
+		        $('div .NoThyroid').css('display', 'none');
+		    else
+		        $('div .NoThyroid').css('display', 'block');
 
-            $('#<%= ddlThyroid.ClientID %>').change(function () {
-                if ($(this).val() == 'No') {
-                    $('div .NoThyroid').css('display', 'none');
-                }
-                else {
-                    $('div .NoThyroid').css('display', 'block');
-                }
-            });
+		    $('#<%= ddlThyroid.ClientID %>').change(function () {
+		        if ($(this).val() == 'No') {
+		            $('div .NoThyroid').css('display', 'none');
+		        }
+		        else {
+		            $('div .NoThyroid').css('display', 'block');
+		        }
+		    });
 
-            if ($('#<%= ddlExercise.ClientID %>').val() == 'Yes') {
-                $('div .NoExercise').css('display', 'block');
-            }
-            else {
-                $('div .NoExercise').css('display', 'none');
-            }
-
-
-            $('#<%= ddlExercise.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('div .NoExercise').css('display', 'block');
-                }
-                else {
-                    $('div .NoExercise').css('display', 'none');
-                }
-            });
-
-            $('#<%= ddlVitaminSuplement.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('div .vitamindiv').css('opacity', '1');
-                }
-                else {
-                    $('div .vitamindiv').css('opacity', '0');
-                }
-            });
-
-            if ($('#<%= ddlVitaminSuplement.ClientID %>').val() == 'Yes') {
-                $('div .vitamindiv').css('opacity', '1');
-            }
-            else {
-                $('div .vitamindiv').css('opacity', '0');
-            }
-
-            $('#<%= ddlMineralSuppliment.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('div .mineraldiv').css('opacity', '1');
-                }
-                else {
-                    $('div .mineraldiv').css('opacity', '0');
-                }
-            });
-
-            if ($('#<%= ddlMineralSuppliment.ClientID %>').val() == 'Yes') {
-                $('div .mineraldiv').css('opacity', '1');
-            }
-            else {
-                $('div .mineraldiv').css('opacity', '0');
-            }
-
-            $('#<%= ddlOralDetails.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('div .oraldiv').css('opacity', '1');
-                }
-                else {
-                    $('div .oraldiv').css('opacity', '0');
-                }
-            });
-
-            if ($('#<%= ddlOralDetails.ClientID %>').val() == 'Yes') {
-                $('div .oraldiv').css('opacity', '1');
-            }
-            else {
-                $('div .oraldiv').css('opacity', '0');
-            }
-
-            $('#<%= ddlDietType.ClientID %>').change(function () {
-                if ($(this).val().toUpperCase() == 'NON-VEGETARIAN') {
-                    $('div .nonveg').css('display', 'block');
-                    $('div .chicken').css('display', 'none');
-                    $('div .egg').css('display', 'none');
-                    $('div .fish').css('display', 'none');
-                    $('div .meat').css('display', 'none');
-                    Nonveg();
-                }
-                else {
-                    $('div .nonveg').css('display', 'none');
-                    $('div .chicken').css('display', 'none');
-                    $('div .egg').css('display', 'none');
-                    $('div .fish').css('display', 'none');
-                    $('div .meat').css('display', 'none');
-                }
-            });
-
-            $('#<%= chkNonvegType.ClientID %>').click(function (e) {
-                Nonveg();
-            });
-            if ($('#<%= ddlDietType.ClientID %>').val().toUpperCase() == 'NON-VEGETARIAN') {
-                $('div .nonveg').css('display', 'block');
-                $('div .chicken').css('display', 'none');
-                $('div .egg').css('display', 'none');
-                $('div .fish').css('display', 'none');
-                $('div .meat').css('display', 'none');
-                Nonveg();
-            }
-            else {
-                $('div .nonveg').css('display', 'none');
-                $('div .chicken').css('display', 'none');
-                $('div .egg').css('display', 'none');
-                $('div .fish').css('display', 'none');
-                $('div .meat').css('display', 'none');
-            }
-
-            $('#<%= txtTestDate.ClientID %>').datepicker({
-                autoclose: true,
-                format: 'dd/mm/yyyy'
-            }).mask('99/99/9999');
-
-            $("#<%=ddlActivity.ClientID%>").change(function () {
-                BMR();
-            });
-
-        };
-        function Nonveg() {
-
-            $("[id*='ContentPlaceHolder1_ContentPlaceHolder3_chkNonvegType']").each(function () {
-                if ($(this).val().toUpperCase() == 'CHICKEN') {
-                    if ($(this).is(":checked") == true) {
-                        $('div .chicken').css('display', 'block');
-                    }
-                    else {
-                        $('div .chicken').css('display', 'none');
-                    }
-                }
-                if ($(this).val().toUpperCase() == 'EGG') {
-                    if ($(this).is(":checked") == true) {
-                        $('div .egg').css('display', 'block');
-                    }
-                    else {
-                        $('div .egg').css('display', 'none');
-                    }
-                }
-                if ($(this).val().toUpperCase() == 'FISH') {
-                    if ($(this).is(":checked") == true) {
-                        $('div .fish').css('display', 'block');
-                    }
-                    else {
-                        $('div .fish').css('display', 'none');
-                    }
-                }
-                if ($(this).val().toUpperCase() == "RED MEAT") {
-                    if ($(this).is(":checked") == true) {
-                        $('div .meat').css('display', 'block');
-                    }
-                    else {
-                        $('div .meat').css('display', 'none');
-                    }
-                }
-                if ($(this).val().toUpperCase() == 'ALL') {
-                    if ($(this).is(":checked") == true) {
-                        $('div .meat').css('display', 'block');
-                        $('div .fish').css('display', 'block');
-                        $('div .egg').css('display', 'block');
-                        $('div .chicken').css('display', 'block');
-                    }
-                }
-            });
-        }
-
-        function BMI() {
-
-            // ****************      Calculated BMI             **************
-
-            var Height = document.getElementById('<%=txtHeight.ClientID %>').value;
-            var weight = document.getElementById('<%=txtWeight.ClientID %>').value;
-
-            var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
-            var WeightBaseUnit = document.getElementById('<%=ddlWeightUnit.ClientID %>').value;
-
-            var sex = document.getElementById('<%=ddlGender.ClientID %>').value;
+		    if ($('#<%= ddlExercise.ClientID %>').val() == 'Yes') {
+		        $('div .NoExercise').css('display', 'block');
+		    }
+		    else {
+		        $('div .NoExercise').css('display', 'none');
+		    }
 
 
-            if (weight == '') {
-                //  alert('Please enter weight for BMI calculations');
+		    $('#<%= ddlExercise.ClientID %>').change(function () {
+		        if ($(this).val() == 'Yes') {
+		            $('div .NoExercise').css('display', 'block');
+		        }
+		        else {
+		            $('div .NoExercise').css('display', 'none');
+		        }
+		    });
 
-            }
-            else if (Height == '') {
-                //  alert('Please enter Height for BMI calculations');
-            }
+		    $('#<%= ddlVitaminSuplement.ClientID %>').change(function () {
+		        if ($(this).val() == 'Yes') {
+		            $('div .vitamindiv').css('opacity', '1');
+		        }
+		        else {
+		            $('div .vitamindiv').css('opacity', '0');
+		        }
+		    });
 
-            else {
+		    if ($('#<%= ddlVitaminSuplement.ClientID %>').val() == 'Yes') {
+		        $('div .vitamindiv').css('opacity', '1');
+		    }
+		    else {
+		        $('div .vitamindiv').css('opacity', '0');
+		    }
 
-                Height = ConvertToMeters(Height, HeightBaseUnit); // Convert height from baseUnit to meter
-                weight = ConvertToKgs(weight, WeightBaseUnit);
+		    $('#<%= ddlMineralSuppliment.ClientID %>').change(function () {
+		        if ($(this).val() == 'Yes') {
+		            $('div .mineraldiv').css('opacity', '1');
+		        }
+		        else {
+		            $('div .mineraldiv').css('opacity', '0');
+		        }
+		    });
 
-                var BMI = (weight / (Height * Height)).toFixed(2); //Roundoff to two decimals
-             <%--   document.getElementById('<%=txtBMI.ClientID %>').disabled = false;--%>
-                document.getElementById('<%=txtBMI.ClientID %>').value = BMI;
+		    if ($('#<%= ddlMineralSuppliment.ClientID %>').val() == 'Yes') {
+		        $('div .mineraldiv').css('opacity', '1');
+		    }
+		    else {
+		        $('div .mineraldiv').css('opacity', '0');
+		    }
+
+		    $('#<%= ddlOralDetails.ClientID %>').change(function () {
+		        if ($(this).val() == 'Yes') {
+		            $('div .oraldiv').css('opacity', '1');
+		        }
+		        else {
+		            $('div .oraldiv').css('opacity', '0');
+		        }
+		    });
+
+		    if ($('#<%= ddlOralDetails.ClientID %>').val() == 'Yes') {
+		        $('div .oraldiv').css('opacity', '1');
+		    }
+		    else {
+		        $('div .oraldiv').css('opacity', '0');
+		    }
+
+		    $('#<%= ddlDietType.ClientID %>').change(function () {
+		        if ($(this).val().toUpperCase() == 'NON-VEGETARIAN') {
+		            $('div .nonveg').css('display', 'block');
+		            $('div .chicken').css('display', 'none');
+		            $('div .egg').css('display', 'none');
+		            $('div .fish').css('display', 'none');
+		            $('div .meat').css('display', 'none');
+		            Nonveg();
+		        }
+		        else {
+		            $('div .nonveg').css('display', 'none');
+		            $('div .chicken').css('display', 'none');
+		            $('div .egg').css('display', 'none');
+		            $('div .fish').css('display', 'none');
+		            $('div .meat').css('display', 'none');
+		        }
+		    });
+
+		    $('#<%= chkNonvegType.ClientID %>').click(function (e) {
+		        Nonveg();
+		    });
+		    if ($('#<%= ddlDietType.ClientID %>').val().toUpperCase() == 'NON-VEGETARIAN') {
+		        $('div .nonveg').css('display', 'block');
+		        $('div .chicken').css('display', 'none');
+		        $('div .egg').css('display', 'none');
+		        $('div .fish').css('display', 'none');
+		        $('div .meat').css('display', 'none');
+		        Nonveg();
+		    }
+		    else {
+		        $('div .nonveg').css('display', 'none');
+		        $('div .chicken').css('display', 'none');
+		        $('div .egg').css('display', 'none');
+		        $('div .fish').css('display', 'none');
+		        $('div .meat').css('display', 'none');
+		    }
+
+		    $('#<%= txtTestDate.ClientID %>').datepicker({
+		        autoclose: true,
+		        format: 'dd/mm/yyyy'
+		    }).mask('99/99/9999');
+
+		    $("#<%=ddlActivity.ClientID%>").change(function () {
+		        BMR();
+		    });
+
+		};
+		function Nonveg() {
+
+		    $("[id*='ContentPlaceHolder1_ContentPlaceHolder3_chkNonvegType']").each(function () {
+		        if ($(this).val().toUpperCase() == 'CHICKEN') {
+		            if ($(this).is(":checked") == true) {
+		                $('div .chicken').css('display', 'block');
+		            }
+		            else {
+		                $('div .chicken').css('display', 'none');
+		            }
+		        }
+		        if ($(this).val().toUpperCase() == 'EGG') {
+		            if ($(this).is(":checked") == true) {
+		                $('div .egg').css('display', 'block');
+		            }
+		            else {
+		                $('div .egg').css('display', 'none');
+		            }
+		        }
+		        if ($(this).val().toUpperCase() == 'FISH') {
+		            if ($(this).is(":checked") == true) {
+		                $('div .fish').css('display', 'block');
+		            }
+		            else {
+		                $('div .fish').css('display', 'none');
+		            }
+		        }
+		        if ($(this).val().toUpperCase() == "RED MEAT") {
+		            if ($(this).is(":checked") == true) {
+		                $('div .meat').css('display', 'block');
+		            }
+		            else {
+		                $('div .meat').css('display', 'none');
+		            }
+		        }
+		        if ($(this).val().toUpperCase() == 'ALL') {
+		            if ($(this).is(":checked") == true) {
+		                $('div .meat').css('display', 'block');
+		                $('div .fish').css('display', 'block');
+		                $('div .egg').css('display', 'block');
+		                $('div .chicken').css('display', 'block');
+		            }
+		        }
+		    });
+		}
+
+		function BMI() {
+
+		    // ****************      Calculated BMI             **************
+
+		    var Height = document.getElementById('<%=txtHeight.ClientID %>').value;
+		    var weight = document.getElementById('<%=txtWeight.ClientID %>').value;
+
+		    var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
+		    var WeightBaseUnit = document.getElementById('<%=ddlWeightUnit.ClientID %>').value;
+
+		    var sex = document.getElementById('<%=ddlGender.ClientID %>').value;
+
+
+		    if (weight == '') {
+		        //  alert('Please enter weight for BMI calculations');
+
+		    }
+		    else if (Height == '') {
+		        //  alert('Please enter Height for BMI calculations');
+		    }
+
+		    else {
+
+		        Height = ConvertToMeters(Height, HeightBaseUnit); // Convert height from baseUnit to meter
+		        weight = ConvertToKgs(weight, WeightBaseUnit);
+
+		        var BMI = (weight / (Height * Height)).toFixed(2); //Roundoff to two decimals
+			 <%--   document.getElementById('<%=txtBMI.ClientID %>').disabled = false;--%>
+			    document.getElementById('<%=txtBMI.ClientID %>').value = BMI;
 <%--                document.getElementById('<%=txtBMI.ClientID %>').disabled = true;--%>
-                if (BMI <= 15) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Very severely underweight";
-                }
-                else if (BMI > 15 && BMI <= 16) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Severely underweight";
-                }
-                else if (BMI > 16 && BMI <= 18.5) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Underweight";
-                }
-                else if (BMI > 18.5 && BMI <= 25) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Normal (Healthy weight)";
-                }
-                else if (BMI > 25 && BMI <= 30) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Overweight";
-                }
-                else if (BMI > 30 && BMI <= 35) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class I (Moderately obese)";
-                }
-                else if (BMI > 35 && BMI <= 40) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class II (Severely obese)";
-                }
-                else if (BMI > 40) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class III (Very severely obese)";
-                }
+			    if (BMI <= 15) {
+			        document.getElementById('<%=txtBMICategory.ClientID %>').value = "Very severely underweight";
+				}
+				else if (BMI > 15 && BMI <= 16) {
+				    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Severely underweight";
+				}
+				else if (BMI > 16 && BMI <= 18.5) {
+				    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Underweight";
+				}
+				else if (BMI > 18.5 && BMI <= 25) {
+				    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Normal (Healthy weight)";
+				}
+				else if (BMI > 25 && BMI <= 30) {
+				    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Overweight";
+				}
+				else if (BMI > 30 && BMI <= 35) {
+				    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class I (Moderately obese)";
+				}
+				else if (BMI > 35 && BMI <= 40) {
+				    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class II (Severely obese)";
+				}
+				else if (BMI > 40) {
+				    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class III (Very severely obese)";
+				}
 
-                //IBW();
+			    //IBW();
 }
 
 }
@@ -967,199 +1022,199 @@ function IBW() {
     var wt;
 
     if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Select') {
-        // alert('Please select gender IBW.');
-    }
-    else if (document.getElementById('<%=txtHeight.ClientID %>').value == '') {
-        //  alert('Please enter Height IBW'); 
-    }
-    else {
-        if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
+	    // alert('Please select gender IBW.');
+	}
+	else if (document.getElementById('<%=txtHeight.ClientID %>').value == '') {
+	    //  alert('Please enter Height IBW'); 
+	}
+	else {
+	    if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
 
-            gender = 'Male';
-            // alert(gender);
-        }
-        else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
-            gender = 'Female';
-            // alert(gender);
-        }
+	        gender = 'Male';
+	        // alert(gender);
+	    }
+	    else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
+		    gender = 'Female';
+		    // alert(gender);
+		}
 
         var mainhight = document.getElementById('<%=txtHeight.ClientID %>').value;
-        var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
+	    var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
 
-        mainhight = ConvertToInches(mainhight, HeightBaseUnit);
+	    mainhight = ConvertToInches(mainhight, HeightBaseUnit);
 
-        var Diff = mainhight - 60;
-        //  alert(Diff);
-        if (gender == "Male") {
-            wt = (106 + (6 * Diff));
-            //   alert(wt);
-        }
-        else if (gender == "Female") {
-            wt = (100 + (5 * Diff));
-            //  alert(wt);
-        }
-        //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = false;
-        if (document.getElementById('<%=txtBodyFrame.ClientID %>').value == "small") {
-            wt = wt - (wt / 10);
-            document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt.toFixed(2);
+	    var Diff = mainhight - 60;
+	    //  alert(Diff);
+	    if (gender == "Male") {
+	        wt = (106 + (6 * Diff));
+	        //   alert(wt);
+	    }
+	    else if (gender == "Female") {
+	        wt = (100 + (5 * Diff));
+	        //  alert(wt);
+	    }
+	    //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = false;
+	    if (document.getElementById('<%=txtBodyFrame.ClientID %>').value == "small") {
+	        wt = wt - (wt / 10);
+	        document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt.toFixed(2);
         }
         else if (document.getElementById('<%=txtBodyFrame.ClientID %>').value == "medium" || document.getElementById('<%=txtBodyFrame.ClientID %>').value == "unavailable") {
-            wt = wt;
-            document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt.toFixed(2);
+		    wt = wt;
+		    document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt.toFixed(2);
         }
         else if (document.getElementById('<%=txtBodyFrame.ClientID %>').value == "large") {
-            wt = wt + (wt / 10);
-            document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt.toFixed(2);
+		    wt = wt + (wt / 10);
+		    document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt.toFixed(2);
         }
-        //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = false;
-        var wt_Kg = ConvertToKgs(wt, 'LBS');
+	    //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = false;
+	    var wt_Kg = ConvertToKgs(wt, 'LBS');
 
-        document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt_Kg.toFixed(2);
-        //if IBW is less than zero
-        if (wt_Kg < 0)
-            $("#lblIdlBdyWghtMsg").removeClass("hidden");
-        else
-            $("#lblIdlBdyWghtMsg").addClass("hidden");
-        //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = true;
-    }
+	    document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt_Kg.toFixed(2);
+	    //if IBW is less than zero
+		if (wt_Kg < 0)
+		    $("#lblIdlBdyWghtMsg").removeClass("hidden");
+		else
+		    $("#lblIdlBdyWghtMsg").addClass("hidden");
+	    //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = true;
+	}
 
 
 }
         /*
-         Body Frame calculation
-        
-         Women:
-        
-         Height under 5'2"
-         Small = wrist size less than 5.5"
-         Medium = wrist size 5.5" to 5.75"
-         Large = wrist size over 5.75"
-        
-         Height 5'2" to 5' 5"
-         Small = wrist size less than 6"
-         Medium = wrist size 6" to 6.25"
-         Large = wrist size over 6.25"
-        
-         Height over 5' 5"
-         Small = wrist size less than 6.25"
-         Medium = wrist size 6.25" to 6.5"
-         Large = wrist size over 6.5"
-        
-        
-         Men:
-        
-         Height over 5' 5"
-         Small = wrist size 5.5" to 6.5"
-         Medium = wrist size 6.5" to 7.5"
-         Large = wrist size over 7.5"
-        
-        */
+		 Body Frame calculation
+		
+		 Women:
+		
+		 Height under 5'2"
+		 Small = wrist size less than 5.5"
+		 Medium = wrist size 5.5" to 5.75"
+		 Large = wrist size over 5.75"
+		
+		 Height 5'2" to 5' 5"
+		 Small = wrist size less than 6"
+		 Medium = wrist size 6" to 6.25"
+		 Large = wrist size over 6.25"
+		
+		 Height over 5' 5"
+		 Small = wrist size less than 6.25"
+		 Medium = wrist size 6.25" to 6.5"
+		 Large = wrist size over 6.5"
+		
+		
+		 Men:
+		
+		 Height over 5' 5"
+		 Small = wrist size 5.5" to 6.5"
+		 Medium = wrist size 6.5" to 7.5"
+		 Large = wrist size over 7.5"
+		
+		*/
         function BodyFrame() {
 
             debugger;
             var bodyFrame = "unavailable";
 
             var Height = document.getElementById('<%=txtHeight.ClientID %>').value;
-            var Wrist = document.getElementById('<%=txtwrist.ClientID %>').value;
+			var Wrist = document.getElementById('<%=txtwrist.ClientID %>').value;
 
-            var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
-            var WristBaseUnit = document.getElementById('<%=ddlWristUnit.ClientID %>').value;
+		    var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
+		    var WristBaseUnit = document.getElementById('<%=ddlWristUnit.ClientID %>').value;
 
-            Height = ConvertToFoots(Height, HeightBaseUnit);
-            Wrist = ConvertToInches(Wrist, WristBaseUnit);
+		    Height = ConvertToFoots(Height, HeightBaseUnit);
+		    Wrist = ConvertToInches(Wrist, WristBaseUnit);
 
-            if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
+		    if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
 
-                // Height under 5'2"
-                if (Height < 5.2 && Height > 0) {
-                    // Small = wrist size less than 5.5"
-                    if (Wrist < 5.5 && Wrist > 0) {
-                        bodyFrame = "small";
-                    }
-                        // Medium = wrist size 5.5" to 5.75"
-                    else if (Wrist >= 5.5 && Wrist <= 5.75) {
-                        bodyFrame = "medium";
-                    }
-                        // Large = wrist size over 5.75"
-                    else if (Wrist > 5.75) {
-                        bodyFrame = "large";
-                    }
-                }
-                    // Height 5'2" to 5' 5"
-                else if (Height >= 5.2 && Height <= 5.5) {
-                    // Small = wrist size less than 6"
-                    if (Wrist < 6 && Wrist > 0) {
-                        bodyFrame = "small";
-                    }
-                        // Medium = wrist size 6" to 6.25"
-                    else if (Wrist >= 6 && Wrist <= 6.25) {
-                        bodyFrame = "medium";
-                    }
-                        // Large = wrist size over 6.25"
-                    else if (Wrist > 6.25) {
-                        bodyFrame = "large";
-                    }
+			    // Height under 5'2"
+			    if (Height < 5.2 && Height > 0) {
+			        // Small = wrist size less than 5.5"
+			        if (Wrist < 5.5 && Wrist > 0) {
+			            bodyFrame = "small";
+			        }
+			            // Medium = wrist size 5.5" to 5.75"
+			        else if (Wrist >= 5.5 && Wrist <= 5.75) {
+			            bodyFrame = "medium";
+			        }
+			            // Large = wrist size over 5.75"
+			        else if (Wrist > 5.75) {
+			            bodyFrame = "large";
+			        }
+			    }
+			        // Height 5'2" to 5' 5"
+			    else if (Height >= 5.2 && Height <= 5.5) {
+			        // Small = wrist size less than 6"
+			        if (Wrist < 6 && Wrist > 0) {
+			            bodyFrame = "small";
+			        }
+			            // Medium = wrist size 6" to 6.25"
+			        else if (Wrist >= 6 && Wrist <= 6.25) {
+			            bodyFrame = "medium";
+			        }
+			            // Large = wrist size over 6.25"
+			        else if (Wrist > 6.25) {
+			            bodyFrame = "large";
+			        }
 
-                }
-                    // Height over 5' 5"
-                else if (Height > 5.5) {
-                    // Small = wrist size less than 6.25"
-                    if (Wrist < 6.25 && Wrist > 0) {
-                        bodyFrame = "small";
-                    }
-                        // Medium = wrist size 6.25" to 6.5"
-                    else if (Wrist >= 6.25 && Wrist <= 6.5) {
-                        bodyFrame = "medium";
-                    }
-                        // Large = wrist size over 6.5"
-                    else if (Wrist > 6.5) {
-                        bodyFrame = "large";
-                    }
-                }
+			    }
+			        // Height over 5' 5"
+			    else if (Height > 5.5) {
+			        // Small = wrist size less than 6.25"
+			        if (Wrist < 6.25 && Wrist > 0) {
+			            bodyFrame = "small";
+			        }
+			            // Medium = wrist size 6.25" to 6.5"
+			        else if (Wrist >= 6.25 && Wrist <= 6.5) {
+			            bodyFrame = "medium";
+			        }
+			            // Large = wrist size over 6.5"
+			        else if (Wrist > 6.5) {
+			            bodyFrame = "large";
+			        }
+			    }
 
-            }
-            else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
-                // Height over 5' 5"
-                if (Height > 5.5) {
-                    // Small = wrist size 5.5" to 6.5"
-                    if (Wrist >= 5.5 && Wrist < 6.5) {
-                        bodyFrame = "small";
-                    }
-                        // Medium = wrist size 6.5" to 7.5"
-                    else if (Wrist >= 6.5 && Wrist <= 7.5) {
-                        bodyFrame = "medium";
-                    }
-                        // Large = wrist size over 7.5"
-                    else if (Wrist > 7.5) {
-                        bodyFrame = "large";
-                    }
+			}
+			else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
+			    // Height over 5' 5"
+			    if (Height >= 5.5) {
+			        // Small = wrist size 5.5" to 6.5"
+			        if (Wrist >= 5.5 && Wrist < 6.5) {
+			            bodyFrame = "small";
+			        }
+			            // Medium = wrist size 6.5" to 7.5"
+			        else if (Wrist >= 6.5 && Wrist <= 7.5) {
+			            bodyFrame = "medium";
+			        }
+			            // Large = wrist size over 7.5"
+			        else if (Wrist > 7.5) {
+			            bodyFrame = "large";
+			        }
 
-                }
-            }
-            //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = false;
-            document.getElementById('<%=txtBodyFrame.ClientID %>').value = bodyFrame;
-            //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = true;
+			    }
+			}
+		    //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = false;
+		    document.getElementById('<%=txtBodyFrame.ClientID %>').value = bodyFrame;
+		    //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = true;
 
-        }
+		}
         function CalculateAge() {
 
             var birthDay = document.getElementById('<%=txtDOB.ClientID %>').value;
 
-            var dateParts = birthDay.split("/");
+		    var dateParts = birthDay.split("/");
 
-            var DOB = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+		    var DOB = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
 
-            var today = new Date();
-            var age = today.getTime() - DOB.getTime();
-            age = Math.floor(age / (1000 * 60 * 60 * 24 * 365.25));
-            if (age != "NaN") {
-                document.getElementById('<%=txtAge.ClientID %>').value = age;
-                if (age < 18)
-                    $('div .child').css('display', 'block');
-                else
-                    $('div .child').css('display', 'none');
-                SetTabs();
-            }
+		    var today = new Date();
+		    var age = today.getTime() - DOB.getTime();
+		    age = Math.floor(age / (1000 * 60 * 60 * 24 * 365.25));
+		    if (age != "NaN") {
+		        document.getElementById('<%=txtAge.ClientID %>').value = age;
+			    if (age < 18)
+			        $('div .child').css('display', 'block');
+			    else
+			        $('div .child').css('display', 'none');
+			    SetTabs();
+			}
         }
 
 
@@ -1168,13 +1223,13 @@ function IBW() {
         //        Men: BMR = 66 + ( 13.7 x weight in kilos ) + ( 5 x height in cm ) - ( 6.8 x age in years )
 
         /*
-                    1. If you are sedentary (little or no exercise) : Calorie-Calculation = BMR x 1.2
-                    2. If you are lightly active (light exercise/sports 1-3 days/week) : Calorie-Calculation = BMR x 1.375
-                    3. If you are moderatetely active (moderate exercise/sports 3-5 days/week) : Calorie-Calculation = BMR x 1.55
-                    4. If you are very active (hard exercise/sports 6-7 days a week) : Calorie-Calculation = BMR x 1.725
-                    5. If you are extra active (very hard exercise/sports & physical job or 2x training) : Calorie-Calculation = BMR x 1.9        
-        
-        */
+					1. If you are sedentary (little or no exercise) : Calorie-Calculation = BMR x 1.2
+					2. If you are lightly active (light exercise/sports 1-3 days/week) : Calorie-Calculation = BMR x 1.375
+					3. If you are moderatetely active (moderate exercise/sports 3-5 days/week) : Calorie-Calculation = BMR x 1.55
+					4. If you are very active (hard exercise/sports 6-7 days a week) : Calorie-Calculation = BMR x 1.725
+					5. If you are extra active (very hard exercise/sports & physical job or 2x training) : Calorie-Calculation = BMR x 1.9        
+		
+		*/
 
         function BMR() {
             debugger;
@@ -1183,129 +1238,129 @@ function IBW() {
             var activity = 0;
             var gender = "unavailable";
             var Height = document.getElementById('<%=txtHeight.ClientID %>').value;
-            var weight = document.getElementById('<%=txtWeight.ClientID %>').value;
+			var weight = document.getElementById('<%=txtWeight.ClientID %>').value;
 
-            var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
-            var WeightBaseUnit = document.getElementById('<%=ddlWeightUnit.ClientID %>').value;
-            var act = document.getElementById('<%=ddlActivity.ClientID %>').value.toUpperCase();
+		    var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
+		    var WeightBaseUnit = document.getElementById('<%=ddlWeightUnit.ClientID %>').value;
+		    var act = document.getElementById('<%=ddlActivity.ClientID %>').value.toUpperCase();
 
-            Height = ConvertToCms(Height, HeightBaseUnit); // Convert height from baseUnit to CM
-            weight = ConvertToKgs(weight, WeightBaseUnit);
+		    Height = ConvertToCms(Height, HeightBaseUnit); // Convert height from baseUnit to CM
+		    weight = ConvertToKgs(weight, WeightBaseUnit);
 
-            if (act == 'SEDENTARY(LITTLE OR NO EXERCISE)')
-                activity = 1.2;
-            else if (act == 'LIGHTLY ACTIVE (LIGHT EXERCISE/ SPORTS 1-3 DAYS/WEEK)')
-                activity = 1.375;
-            else if (act == 'MODERATELY ACTIVE (MODERATE EXERCISE/SPORTS 3-5 DAYS A WEEK)')
-                activity = 1.55;
-            else if (act == 'VERY ACTIVE (HARD EXERCISE/SPORTS 3-5 DAYS/ WEEK)')
-                activity = 1.725;
-            else if (act == 'EXTRA ACTIVE (VERY HARD EXERCISE/SPORTS & PHYSICAL JOB OR 2X TRAINING)')
-                activity = 1.9;
-            else
-                activity = 0;
+		    if (act == 'SEDENTARY(LITTLE OR NO EXERCISE)')
+		        activity = 1.2;
+		    else if (act == 'LIGHTLY ACTIVE (LIGHT EXERCISE/ SPORTS 1-3 DAYS/WEEK)')
+		        activity = 1.375;
+		    else if (act == 'MODERATELY ACTIVE (MODERATE EXERCISE/SPORTS 3-5 DAYS A WEEK)')
+		        activity = 1.55;
+		    else if (act == 'VERY ACTIVE (HARD EXERCISE/SPORTS 3-5 DAYS/ WEEK)')
+		        activity = 1.725;
+		    else if (act == 'EXTRA ACTIVE (VERY HARD EXERCISE/SPORTS & PHYSICAL JOB OR 2X TRAINING)')
+		        activity = 1.9;
+		    else
+		        activity = 0;
 
-            if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Select') {
-                // alert('Please select gender IBW.');
-            }
-            else if (document.getElementById('<%=txtHeight.ClientID %>').value == '') {
-                //  alert('Please enter Height IBW'); 
-            }
-            else {
-                if (weight == '' || Height == '' || document.getElementById('<%=txtAge.ClientID %>').value == '') {
-                    //alert
-                }
-                else {
-                    if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
-                        BMR = (66 + (13.7 * weight) + (5 * Height) - (6.8 * document.getElementById('<%=txtAge.ClientID %>').value)).toFixed(2);
-                        CALORIE = (BMR * activity).toFixed(2);
-                        CalorieCal();
-                        CalorieCal1();
-                    }
-                    else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
-                        BMR = (655 + (9.6 * weight) + (1.8 * Height) - (4.7 * document.getElementById('<%=txtAge.ClientID %>').value)).toFixed(2);
-                        CALORIE = (BMR * activity).toFixed(2);
-                        CalorieCal();
-                        CalorieCal1();
-                    }
+		    if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Select') {
+			    // alert('Please select gender IBW.');
+			}
+			else if (document.getElementById('<%=txtHeight.ClientID %>').value == '') {
+			    //  alert('Please enter Height IBW'); 
+			}
+			else {
+			    if (weight == '' || Height == '' || document.getElementById('<%=txtAge.ClientID %>').value == '') {
+			        //alert
+			    }
+			    else {
+			        if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
+				        BMR = (66 + (13.7 * weight) + (5 * Height) - (6.8 * document.getElementById('<%=txtAge.ClientID %>').value)).toFixed(2);
+					    CALORIE = (BMR * activity).toFixed(2);
+					    CalorieCal();
+					    CalorieCal1();
+					}
+					else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
+					    BMR = (655 + (9.6 * weight) + (1.8 * Height) - (4.7 * document.getElementById('<%=txtAge.ClientID %>').value)).toFixed(2);
+					    CALORIE = (BMR * activity).toFixed(2);
+					    CalorieCal();
+					    CalorieCal1();
+					}
             }
         }
     document.getElementById('<%=txtBMR.ClientID %>').value = BMR;
-            if (document.getElementById('<%=txtFatPer.ClientID %>').value == '' || document.getElementById('<%=txtFatPer.ClientID %>').value == '0.00')
-                document.getElementById('<%=txtFatPer.ClientID %>').value = BMR;
+		    <%--if (document.getElementById('<%=txtFatPer.ClientID %>').value == '' || document.getElementById('<%=txtFatPer.ClientID %>').value == '0.00')
+		        document.getElementById('<%=txtFatPer.ClientID %>').value = BMR;--%>
             document.getElementById('<%=txtCalorie.ClientID %>').value = CALORIE;
-            document.getElementById('<%=txtCalorie1.ClientID %>').value = CALORIE;
-            if (document.getElementById('<%=txtCalorie2.ClientID %>').value == '')
-                document.getElementById('<%=txtCalorie2.ClientID %>').value = CALORIE;
+		    document.getElementById('<%=txtCalorie1.ClientID %>').value = CALORIE;
+		    if (document.getElementById('<%=txtCalorie2.ClientID %>').value == '')
+		        document.getElementById('<%=txtCalorie2.ClientID %>').value = CALORIE;
         }
 
         //Calcualte calorie consumption
         /*
-        
-        Carbhohydrates	%  Of Calories	Kcal=	daily calories x percent protein / 4 calories per gram = grams protein
+		
+		Carbhohydrates	%  Of Calories	Kcal=	daily calories x percent protein / 4 calories per gram = grams protein
 			
-        Fat	%  Of Calories		=daily calories x percent fat / 9 calories per gram = grams fat
-    			
-        Protein 	%  Of Calories	=	daily calories x percent carbs / 4 calories per gram = grams carbs
+		Fat	%  Of Calories		=daily calories x percent fat / 9 calories per gram = grams fat
+				
+		Protein 	%  Of Calories	=	daily calories x percent carbs / 4 calories per gram = grams carbs
 
-        */
+		*/
         function CalorieCal() {
             var CALORIE = document.getElementById('<%=txtCalorie.ClientID %>').value;
-            if (CALORIE != 0 && document.getElementById('<%=txtCarbhohydratesPercent.ClientID %>').value != "") {
-                $('#lblCarbo').text((CALORIE * (document.getElementById('<%=txtCarbhohydratesPercent.ClientID %>').value / 100) / 9).toFixed(2));
-            }
-            else {
-                $('#lblCarbo').text('0');
-            }
+		    if (CALORIE != 0 && document.getElementById('<%=txtCarbhohydratesPercent.ClientID %>').value != "") {
+		        $('#lblCarbo').text((CALORIE * (document.getElementById('<%=txtCarbhohydratesPercent.ClientID %>').value / 100) / 9).toFixed(2));
+			}
+			else {
+			    $('#lblCarbo').text('0');
+			}
             if (CALORIE != 0 && document.getElementById('<%=txtFatPercent.ClientID %>').value != "")
-                $('#lblFat').text((CALORIE * (document.getElementById('<%=txtFatPercent.ClientID %>').value / 100) / 9).toFixed(2));
-            else
-                $('#lblFat').text('0');
+		        $('#lblFat').text((CALORIE * (document.getElementById('<%=txtFatPercent.ClientID %>').value / 100) / 9).toFixed(2));
+			else
+			    $('#lblFat').text('0');
 
             if (CALORIE != 0 && document.getElementById('<%=txtProteinPercent.ClientID %>').value != "") {
-                $('#lblProtein').text((CALORIE * (document.getElementById('<%=txtProteinPercent.ClientID %>').value / 100) / 4).toFixed(2));
+		        $('#lblProtein').text((CALORIE * (document.getElementById('<%=txtProteinPercent.ClientID %>').value / 100) / 4).toFixed(2));
 
-            }
-            else
-                $('#lblProtein').text('0');
+			}
+			else
+			    $('#lblProtein').text('0');
         }
 
         function CalorieCal1() {
             var CALORIE = document.getElementById('<%=txtCalorie2.ClientID %>').value;
-            if (CALORIE != 0 && document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value != "") {
-                $('#lblCarbo1').text((CALORIE * (document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value / 100) / 9).toFixed(2));
-            }
-            else {
-                $('#lblCarbo1').text('0');
-            }
+		    if (CALORIE != 0 && document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value != "") {
+		        $('#lblCarbo1').text((CALORIE * (document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value / 100) / 9).toFixed(2));
+			}
+			else {
+			    $('#lblCarbo1').text('0');
+			}
             if (CALORIE != 0 && document.getElementById('<%=txtFatPercent1.ClientID %>').value != "")
-                $('#lblFat1').text((CALORIE * (document.getElementById('<%=txtFatPercent1.ClientID %>').value / 100) / 9).toFixed(2));
-            else
-                $('#lblFat1').text('0');
+		        $('#lblFat1').text((CALORIE * (document.getElementById('<%=txtFatPercent1.ClientID %>').value / 100) / 9).toFixed(2));
+			else
+			    $('#lblFat1').text('0');
 
             if (CALORIE != 0 && document.getElementById('<%=txtProteinPercent1.ClientID %>').value != "") {
-                $('#lblProtein1').text((CALORIE * (document.getElementById('<%=txtProteinPercent1.ClientID %>').value / 100) / 4).toFixed(2));
-                document.getElementById('<%=hdnProtein.ClientID %>').value = (CALORIE * (document.getElementById('<%=txtProteinPercent1.ClientID %>').value / 100) / 4).toFixed(2);
-            }
-            else
-                $('#lblProtein1').text('0');
+		        $('#lblProtein1').text((CALORIE * (document.getElementById('<%=txtProteinPercent1.ClientID %>').value / 100) / 4).toFixed(2));
+			    document.getElementById('<%=hdnProtein.ClientID %>').value = (CALORIE * (document.getElementById('<%=txtProteinPercent1.ClientID %>').value / 100) / 4).toFixed(2);
+			}
+			else
+			    $('#lblProtein1').text('0');
         }
 
 
         function CalculatePercent() {
             var txtFirstNumberValue = document.getElementById('<%=txtProteinPercent1.ClientID %>').value;
-            var txtSecondNumberValue = document.getElementById('<%=txtFatPercent1.ClientID %>').value;
-            if (!isNaN(txtFirstNumberValue) && !isNaN(txtSecondNumberValue)) {
-                var result = parseInt(txtFirstNumberValue) + parseInt(txtSecondNumberValue);
-                if (result < 100) {
-                    document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value = 100 - parseFloat(result);
-                }
-                else if (result = 100) {
-                    document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value = 0;
-                }
-                else {
-                    alert("Sum of the Protein and Carb % should be less than or equal to 100")
-                }
+		    var txtSecondNumberValue = document.getElementById('<%=txtFatPercent1.ClientID %>').value;
+		    if (!isNaN(txtFirstNumberValue) && !isNaN(txtSecondNumberValue)) {
+		        var result = parseInt(txtFirstNumberValue) + parseInt(txtSecondNumberValue);
+		        if (result < 100) {
+		            document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value = 100 - parseFloat(result);
+				}
+				else if (result = 100) {
+				    document.getElementById('<%=txtCarbhohydratesPercent1.ClientID %>').value = 0;
+				}
+				else {
+				    alert("Sum of the Protein and Carb % should be less than or equal to 100")
+				}
 
         }
     }
@@ -1313,8 +1368,8 @@ function IBW() {
     </script>
     <style>
         /*#tabs {
-            font-size: 14px;
-        }*/
+			font-size: 14px;
+		}*/
 
         .ui-widget-header {
             bacKground: #b9cd6d;
@@ -1414,7 +1469,7 @@ function IBW() {
                                         <asp:TextBox ID="txtPatientID" CssClass="form-control" runat="server" TabIndex="1" Enabled="false" autocomplete="off" Visible="false"></asp:TextBox>
                                         <asp:TextBox ID="txtName" CssClass="form-control" runat="server" TabIndex="2" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator1" runat="server" ErrorMessage="Client Name Required" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1422,7 +1477,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtMiddleName" runat="server" TabIndex="3" autocomplete="off"></asp:TextBox>
                                         <%--                                    <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator2" runat="server" ErrorMessage="Client Middle Name Required" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1430,7 +1485,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtLastName" runat="server" TabIndex="4" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator3" runat="server" ErrorMessage="Client LastName  Required" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1438,14 +1493,14 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control cur" ID="txtDOB" runat="server" TabIndex="5" autocomplete="off" PlaceHolder="dd/MM/yyyy" Style="cursor: auto !important" onchange="CalculateAge();BMR();"></asp:TextBox>
                                         <%--<span style="position: absolute">
-                                            <asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
-                                            <asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
-                                                TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
-                                            </asp:CalendarExtender>
-                                        </span>--%>
+											<asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
+											<asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
+												TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
+											</asp:CalendarExtender>
+										</span>--%>
                                         <%--<span class="input-group-btn">
-                                            <button class="btn btn-primary btn-date" type="button"><i class="fa fa-calendar"></i></button>
-                                        </span>--%>
+											<button class="btn btn-primary btn-date" type="button"><i class="fa fa-calendar"></i></button>
+										</span>--%>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator4" runat="server" ErrorMessage="DOB Required" Display="Dynamic" ControlToValidate="txtDOB" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
                                     </div>
                                 </div>
@@ -1542,85 +1597,85 @@ function IBW() {
                                     <div class="col-sm-8  control-block">
                                         <%--<div class="input-group">--%>
                                         <%--<div class="input-group-addon">
-                                                <asp:Label runat="server" ID="lblMob1"></asp:Label>
-                                            </div>--%>
+												<asp:Label runat="server" ID="lblMob1"></asp:Label>
+											</div>--%>
                                         <%--<asp:TextBox CssClass="form-control" ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
-                                            <asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
-                                            <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
+											<asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
+											<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
-                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit" OnServerValidate="MobileNumberValidate"></asp:CustomValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-4 control-label text-right">Landline</label>
                                     <div class="col-sm-8  control-block">
                                         <%--<asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
-                                            <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                            <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
+											<%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
+											<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
-                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit" OnServerValidate="LandlineNumberValidate"></asp:CustomValidator>
                                         <%--</div>--%>
                                     </div>
                                 </div>
-                            <div class="form-group col-sm-6 col-md-4">
-                                <label class="col-sm-4 control-label text-right">Profession</label>
-                                <div class="col-sm-8 control-block">
-                                    <asp:DropDownList CssClass="form-control" ID="ddlProfession" runat="server" TabIndex="16">
-                                        <asp:ListItem>Farming</asp:ListItem>
-                                        <asp:ListItem>Petty Business</asp:ListItem>
-                                        <asp:ListItem>Service Professional</asp:ListItem>
-                                        <asp:ListItem>Service Non-Professional</asp:ListItem>
-                                        <asp:ListItem>Skilled Professional</asp:ListItem>
-                                        <asp:ListItem>Unskilled Professional</asp:ListItem>
-                                        <asp:ListItem>Pensioner/Retired</asp:ListItem>
-                                        <asp:ListItem>Unemployed</asp:ListItem>
-                                        <asp:ListItem>Housewife</asp:ListItem>
-                                        <asp:ListItem>Other,Specify</asp:ListItem>
-                                    </asp:DropDownList>
-
-                                    <asp:TextBox runat="server" ID="txtProfessionOthers" CssClass="form-control profession"></asp:TextBox>
-                                </div>
-                            </div>
-                            <%-- <div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Present Exercise</label>
+                                <div class="form-group col-sm-6 col-md-4">
+                                    <label class="col-sm-4 control-label text-right">Profession</label>
                                     <div class="col-sm-8 control-block">
-                                        <asp:TextBox CssClass="form-control" ID="txtExercise1" runat="server" TabIndex="17" autocomplete="off"></asp:TextBox>
-                                        <%-- <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator10" runat="server" ErrorMessage="Present Exercise Required" Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator8" runat="server" ErrorMessage="Invalid Present Exercise " Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z0-9''-'\s]{1,100}$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
-                            <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Execise Activity</label>
-                                    <div class="col-sm-8 control-block">
-                                        <asp:TextBox CssClass="form-control" ID="txtExercise2" runat="server" TabIndex="18" autocomplete="off"></asp:TextBox>
-                                        <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator11" runat="server" ErrorMessage="Exercise Activity Required" Display="Dynamic" ControlToValidate="txtExercise2" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                            <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator9" runat="server" ErrorMessage="Invalid Exercise Activity " Display="Dynamic" ControlToValidate="txtExercise2" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,100}$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
+                                        <asp:DropDownList CssClass="form-control" ID="ddlProfession" runat="server" TabIndex="16">
+                                            <asp:ListItem>Farming</asp:ListItem>
+                                            <asp:ListItem>Petty Business</asp:ListItem>
+                                            <asp:ListItem>Service Professional</asp:ListItem>
+                                            <asp:ListItem>Service Non-Professional</asp:ListItem>
+                                            <asp:ListItem>Skilled Professional</asp:ListItem>
+                                            <asp:ListItem>Unskilled Professional</asp:ListItem>
+                                            <asp:ListItem>Pensioner/Retired</asp:ListItem>
+                                            <asp:ListItem>Unemployed</asp:ListItem>
+                                            <asp:ListItem>Housewife</asp:ListItem>
+                                            <asp:ListItem>Other,Specify</asp:ListItem>
+                                        </asp:DropDownList>
 
-                            <div class="form-group col-sm-6 col-md-12">
-                                <label class="col-sm-1 control-label text-right">Notes</label>
-                                <div class="col-sm-11 control-block">
-                                    <asp:TextBox CssClass="form-control" ID="txtNotes" runat="server" TextMode="MultiLine" Width="100%" TabIndex="18" autocomplete="off"></asp:TextBox>
-                                    <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator12" runat="server" ErrorMessage="Client Details Notes Required" Display="Dynamic" ControlToValidate="txtNotes" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                    <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator10" runat="server" ErrorMessage="Invalid Client Details Notes " Display="Dynamic" ControlToValidate="txtNotes" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z0-9''-'\s]{1,100}$"></asp:RegularExpressionValidator>--%>
+                                        <asp:TextBox runat="server" ID="txtProfessionOthers" CssClass="form-control profession"></asp:TextBox>
+                                    </div>
+                                </div>
+                                <%-- <div class="form-group col-sm-6 col-md-4">
+									<label class="col-sm-4 control-label text-right">Present Exercise</label>
+									<div class="col-sm-8 control-block">
+										<asp:TextBox CssClass="form-control" ID="txtExercise1" runat="server" TabIndex="17" autocomplete="off"></asp:TextBox>
+										<%-- <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator10" runat="server" ErrorMessage="Present Exercise Required" Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator8" runat="server" ErrorMessage="Invalid Present Exercise " Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z0-9''-'\s]{1,100}$"></asp:RegularExpressionValidator>
+									</div>
+								</div>--%>
+                                <%--<div class="form-group col-sm-6 col-md-4">
+									<label class="col-sm-4 control-label text-right">Execise Activity</label>
+									<div class="col-sm-8 control-block">
+										<asp:TextBox CssClass="form-control" ID="txtExercise2" runat="server" TabIndex="18" autocomplete="off"></asp:TextBox>
+										<%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator11" runat="server" ErrorMessage="Exercise Activity Required" Display="Dynamic" ControlToValidate="txtExercise2" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
+                                <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator9" runat="server" ErrorMessage="Invalid Exercise Activity " Display="Dynamic" ControlToValidate="txtExercise2" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,100}$"></asp:RegularExpressionValidator>
+									</div>
+								</div>--%>
+
+                                <div class="form-group col-sm-6 col-md-12">
+                                    <label class="col-sm-1 control-label text-right">Notes</label>
+                                    <div class="col-sm-11 control-block">
+                                        <asp:TextBox CssClass="form-control" ID="txtNotes" runat="server" TextMode="MultiLine" Width="100%" TabIndex="18" autocomplete="off"></asp:TextBox>
+                                        <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator12" runat="server" ErrorMessage="Client Details Notes Required" Display="Dynamic" ControlToValidate="txtNotes" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
+                                        <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator10" runat="server" ErrorMessage="Invalid Client Details Notes " Display="Dynamic" ControlToValidate="txtNotes" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z0-9''-'\s]{1,100}$"></asp:RegularExpressionValidator>--%>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-12 padd">
+                                    <div class="col-sm-5 control-block align-center"></div>
+                                    <div class="col-sm-2 control-block align-center">
+                                        <asp:Button runat="server" ID="btnClientData" Text="Save" CssClass="btn btn-primary btn-lg btn-block" CausesValidation="true" ValidationGroup="ValidationGroup" OnClick="btnClientData_Click" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-12 padd">
+                                    <div class="col-sm-12 control-block">
+                                        <asp:ValidationSummary ID="ValClient"
+                                            DisplayMode="BulletList"
+                                            EnableClientScript="true" ValidationGroup="ValidationGroup" runat="server" CssClass="alert alert-danger padd" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group col-sm-6 col-md-12 padd">
-                                <div class="col-sm-5 control-block align-center"></div>
-                                <div class="col-sm-2 control-block align-center">
-                                    <asp:Button runat="server" ID="btnClientData" Text="Save" CssClass="btn btn-primary btn-lg btn-block" CausesValidation="true" ValidationGroup="ValidationGroup" OnClick="btnClientData_Click" />
-                                </div>
-                            </div>
-                            <div class="form-group col-sm-6 col-md-12 padd">
-                                <div class="col-sm-12 control-block">
-                                    <asp:ValidationSummary ID="ValClient"
-                                        DisplayMode="BulletList"
-                                        EnableClientScript="true" ValidationGroup="ValidationGroup" runat="server" CssClass="alert alert-danger padd" />
-                                </div>
-                            </div>
-                        </div>
                         </div>
                         <div id="tabs-2" class="tab-pane fade">
                             <div class="row">
@@ -1644,24 +1699,24 @@ function IBW() {
                                 </div>
 
                                 <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Wt. Loss Month</label>
+									<label class="col-sm-4 control-label text-right">Wt. Loss Month</label>
 
-                                    <div class="col-sm-8  control-block">
-                                        <div class="input-group">
-                                            <asp:TextBox CssClass="form-control" ID="txtWeightLossMonth" runat="server" TabIndex="22" autocomplete="off"></asp:TextBox>
-                                            <div class="input-group-addon">
-                                                <asp:DropDownList CssClass="form-control" ID="ddlWeightUnit1" runat="server" TabIndex="23">
-                                                    <asp:ListItem>Kg</asp:ListItem>
-                                                    <asp:ListItem>Gram</asp:ListItem>
-                                                    <asp:ListItem>Lbs</asp:ListItem>
-                                                </asp:DropDownList>
-                                            </div>
-                                        </div>
+									<div class="col-sm-8  control-block">
+										<div class="input-group">
+											<asp:TextBox CssClass="form-control" ID="txtWeightLossMonth" runat="server" TabIndex="22" autocomplete="off"></asp:TextBox>
+											<div class="input-group-addon">
+												<asp:DropDownList CssClass="form-control" ID="ddlWeightUnit1" runat="server" TabIndex="23">
+													<asp:ListItem>Kg</asp:ListItem>
+													<asp:ListItem>Gram</asp:ListItem>
+													<asp:ListItem>Lbs</asp:ListItem>
+												</asp:DropDownList>
+											</div>
+										</div>
 
-                                        <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator14" runat="server" ErrorMessage="Weight Loss Month Required" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator12" runat="server" ErrorMessage="Invalid Weight Loss Month" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
+										<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator14" runat="server" ErrorMessage="Weight Loss Month Required" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator12" runat="server" ErrorMessage="Invalid Weight Loss Month" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
+									</div>
+								</div>--%>
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-3 control-label text-right">Measured Ht</label><label class="col-sm-1 control-label text-right" style="color: red">*</label>
                                     <div class="col-sm-8  control-block">
@@ -1681,47 +1736,47 @@ function IBW() {
                                     </div>
                                 </div>
                                 <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Wt Loss Six Month</label>
-                                    <div class="col-sm-8  control-block">
-                                        <div class="input-group">
-                                            <asp:TextBox CssClass="form-control" ID="txtWeightLossSixMonths" runat="server" TabIndex="7" autocomplete="off"></asp:TextBox>
-                                            <div class="input-group-addon">
-                                                <asp:DropDownList CssClass="form-control" ID="ddlWeightUnit2" runat="server" TabIndex="8">
-                                                    <asp:ListItem>Kg</asp:ListItem>
-                                                    <asp:ListItem>Gram</asp:ListItem>
-                                                    <asp:ListItem>Lbs</asp:ListItem>
-                                                </asp:DropDownList>
-                                            </div>
-                                        </div>
-                                       
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator14" runat="server" ErrorMessage="Invalid WeightLossSixMonths" Display="Dynamic" ControlToValidate="txtWeightLossSixMonths" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
+									<label class="col-sm-4 control-label text-right">Wt Loss Six Month</label>
+									<div class="col-sm-8  control-block">
+										<div class="input-group">
+											<asp:TextBox CssClass="form-control" ID="txtWeightLossSixMonths" runat="server" TabIndex="7" autocomplete="off"></asp:TextBox>
+											<div class="input-group-addon">
+												<asp:DropDownList CssClass="form-control" ID="ddlWeightUnit2" runat="server" TabIndex="8">
+													<asp:ListItem>Kg</asp:ListItem>
+													<asp:ListItem>Gram</asp:ListItem>
+													<asp:ListItem>Lbs</asp:ListItem>
+												</asp:DropDownList>
+											</div>
+										</div>
+									   
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator14" runat="server" ErrorMessage="Invalid WeightLossSixMonths" Display="Dynamic" ControlToValidate="txtWeightLossSixMonths" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
+									</div>
+								</div>--%>
 
                                 <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Wt Loss Year</label>
-                                    <div class="col-sm-8  control-block">
-                                        <div class="input-group">
-                                            <asp:TextBox CssClass="form-control" ID="txtWeightLossYear" runat="server" TabIndex="11" autocomplete="off"></asp:TextBox>
-                                            <div class="input-group-addon">
-                                                <asp:DropDownList CssClass="form-control" ID="ddlWeightUnit4" runat="server" TabIndex="12">
-                                                    <asp:ListItem>Kg</asp:ListItem>
-                                                    <asp:ListItem>Gram</asp:ListItem>
-                                                    <asp:ListItem>Lbs</asp:ListItem>
-                                                </asp:DropDownList>
-                                            </div>
-                                        </div>
-                                        
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator16" runat="server" ErrorMessage="Invalid WeightLossYear" Display="Dynamic" ControlToValidate="txtWeightLossYear" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
+									<label class="col-sm-4 control-label text-right">Wt Loss Year</label>
+									<div class="col-sm-8  control-block">
+										<div class="input-group">
+											<asp:TextBox CssClass="form-control" ID="txtWeightLossYear" runat="server" TabIndex="11" autocomplete="off"></asp:TextBox>
+											<div class="input-group-addon">
+												<asp:DropDownList CssClass="form-control" ID="ddlWeightUnit4" runat="server" TabIndex="12">
+													<asp:ListItem>Kg</asp:ListItem>
+													<asp:ListItem>Gram</asp:ListItem>
+													<asp:ListItem>Lbs</asp:ListItem>
+												</asp:DropDownList>
+											</div>
+										</div>
+										
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator16" runat="server" ErrorMessage="Invalid WeightLossYear" Display="Dynamic" ControlToValidate="txtWeightLossYear" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
 
-                                    </div>
-                                </div>--%>
+									</div>
+								</div>--%>
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-4 control-label text-right">Calculated BMI</label>
                                     <div class="col-sm-8  control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtBMI" runat="server" autocomplete="off"></asp:TextBox>
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator19" runat="server" ErrorMessage="BMI Required" Display="Dynamic" ControlToValidate="txtBMI" ValidationGroup="validationGroup1" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator17" runat="server" ErrorMessage="Invalid BMI" Display="Dynamic" ControlToValidate="txtBMI" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>--%>
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator17" runat="server" ErrorMessage="Invalid BMI" Display="Dynamic" ControlToValidate="txtBMI" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>--%>
                                     </div>
                                 </div>
 
@@ -1740,14 +1795,14 @@ function IBW() {
                                     <div class="col-sm-8  control-block">
                                         <asp:TextBox CssClass="form-control" runat="server" ID="txtBMICategory"></asp:TextBox>
                                         <%-- <asp:DropDownList CssClass="form-control" ID="ddlBMI" runat="server" Enabled="false">
-                                            <asp:ListItem>--Select BMI--</asp:ListItem>
-                                            <asp:ListItem>Underweight BMI < 18.5</asp:ListItem>
-                                            <asp:ListItem>Normal BMI 18.5 - 22.9</asp:ListItem>
-                                            <asp:ListItem>Overweight 23 - 24.9 </asp:ListItem>
-                                            <asp:ListItem>Obese Class I 25 - 32.9</asp:ListItem>
-                                            <asp:ListItem>Obese Class II 33 - 39.9</asp:ListItem>
-                                            <asp:ListItem>Obese Class III > 40</asp:ListItem>
-                                        </asp:DropDownList>--%>
+											<asp:ListItem>--Select BMI--</asp:ListItem>
+											<asp:ListItem>Underweight BMI < 18.5</asp:ListItem>
+											<asp:ListItem>Normal BMI 18.5 - 22.9</asp:ListItem>
+											<asp:ListItem>Overweight 23 - 24.9 </asp:ListItem>
+											<asp:ListItem>Obese Class I 25 - 32.9</asp:ListItem>
+											<asp:ListItem>Obese Class II 33 - 39.9</asp:ListItem>
+											<asp:ListItem>Obese Class III > 40</asp:ListItem>
+										</asp:DropDownList>--%>
                                     </div>
                                 </div>
 
@@ -1865,7 +1920,7 @@ function IBW() {
                                     <div class="col-sm-8  control-block">
                                         <div class="input-group">
                                             <asp:TextBox CssClass="form-control" ID="txtIdealWeight" runat="server" autocomplete="off"></asp:TextBox>
-                                            <span class="hidden" style="color: red; display: inline;top:35px;bottom:0;left:0;right:0;position: absolute;" id="lblIdlBdyWghtMsg">Please check Height/Weight Values</span>
+                                            <span class="hidden" style="color: red; display: inline; top: 35px; bottom: 0; left: 0; right: 0; position: absolute;" id="lblIdlBdyWghtMsg">Please check Height/Weight Values</span>
                                             <div class="input-group-addon">
                                                 <asp:Label ID="Label8" Text="KG" runat="server"></asp:Label>
                                             </div>
@@ -2018,11 +2073,11 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control cur" ID="txtTestDate" runat="server" TabIndex="1" autocomplete="off" PlaceHolder="dd/MM/yyyy" Style="cursor: auto !important"></asp:TextBox>
                                         <%--<span style="position: absolute">
-                                            <asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
-                                            <asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
-                                                TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
-                                            </asp:CalendarExtender>
-                                        </span>--%>
+											<asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
+											<asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
+												TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
+											</asp:CalendarExtender>
+										</span>--%>
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator2" runat="server" ErrorMessage="Test Date Required" Display="Dynamic" ControlToValidate="txtTestDate" ValidationGroup="validationGroup2" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
                                     </div>
                                 </div>
@@ -2770,9 +2825,9 @@ function IBW() {
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-4 control-label text-right">Sleep Hours Per Day</label>
                                     <div class="col-sm-8  control-block">
-                                        <asp:TextBox CssClass="form-control" runat="server" ID="txtSleep" TabIndex="10" autocomplete="off" PlaceHolder="NN/NN"></asp:TextBox>
+                                        <asp:TextBox CssClass="form-control" runat="server" ID="txtSleep" TabIndex="10" autocomplete="off"></asp:TextBox>
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator45" runat="server" ErrorMessage="ExerciseDetail  Required" Display="Dynamic" ControlToValidate="txtExerciseDetail" ValidationGroup="validationGroup4" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator42" runat="server" ErrorMessage="Invalid Sleep Details" Display="Dynamic" ControlToValidate="txtSleep" ValidationGroup="validationGroup4" ForeColor="Red" ValidationExpression="^\d{1,2}\/\d{1,2}$"></asp:RegularExpressionValidator>
+                                        <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator42" runat="server" ErrorMessage="Invalid Sleep Details" Display="Dynamic" ControlToValidate="txtSleep" ValidationGroup="validationGroup4" ForeColor="Red" ValidationExpression="^\d{1,2}\/\d{1,2}$"></asp:RegularExpressionValidator>--%>
                                     </div>
                                 </div>
 
@@ -3189,12 +3244,12 @@ function IBW() {
                                                     <th style="text-align: left; width: 20%">Food Group</th>
                                                     <th style="width: 70%">Servings</th>
                                                     <%--<th style="width: 10%">Break-fast</th>
-                                                    <th style="width: 10%">Mid-Morning</th>
-                                                    <th style="width: 10%">Lunch</th>
-                                                    <th style="width: 10%">Tea</th>
-                                                    <th style="width: 10%">Snack</th>
-                                                    <th style="width: 10%">Dinner</th>
-                                                    <th style="width: 10%">Bed Time</th>--%>
+													<th style="width: 10%">Mid-Morning</th>
+													<th style="width: 10%">Lunch</th>
+													<th style="width: 10%">Tea</th>
+													<th style="width: 10%">Snack</th>
+													<th style="width: 10%">Dinner</th>
+													<th style="width: 10%">Bed Time</th>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Grains and Cereals</td>
@@ -3203,22 +3258,22 @@ function IBW() {
                                                     </td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtGrain1" Width="82px"></asp:TextBox>
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtGrain1" Width="82px"></asp:TextBox>
+													</td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Dals, Pulses and Legumes</td>
@@ -3226,21 +3281,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtDalsServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtDal1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtDal1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Milk and Milk Products</td>
@@ -3248,21 +3303,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtMilkServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtMilk1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtMilk1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Non-vegetarian foods</td>
@@ -3270,21 +3325,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtNonvegServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtNonveg1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Vegetables</td>
@@ -3292,21 +3347,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtVegetableServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtVegetable1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Fruits</td>
@@ -3314,21 +3369,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtFruitsServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtFruits1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtFruits1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Sugar</td>
@@ -3336,21 +3391,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtSugarServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtSugar1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtSugar1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Fat</td>
@@ -3358,21 +3413,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtFatServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtFat1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtFat1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Water</td>
@@ -3380,21 +3435,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtWaterServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtWater1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtWater1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Miscellaneous</td>
@@ -3441,7 +3496,7 @@ function IBW() {
                                 <%--</span>--%>
                                 <%--<asp:Button runat="server" ID="btnEnd" Text="End Appointment" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnEnd_Click" />--%>
                                 <%-- <asp:Button runat="server" ID="btnUpload" Text="Upload Documents" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnUpload_Click" />
-                            <asp:Button runat="server" ID="btnHistory" Text="History" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnHistory_Click" />--%>
+							<asp:Button runat="server" ID="btnHistory" Text="History" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnHistory_Click" />--%>
                             </div>
                         </div>
                     </div>
@@ -3452,10 +3507,10 @@ function IBW() {
     <asp:UpdateProgress ID="UpdateProgress1" runat="server" AssociatedUpdatePanelID="UpdatePanel1">
         <ProgressTemplate>
             <%--<div class="PkModal">
-                <div class="center">
-                    <img alt="" src="../Images/loader.gif" />
-                </div>
-            </div>--%>
+				<div class="center">
+					<img alt="" src="../Images/loader.gif" />
+				</div>
+			</div>--%>
             <div id="loading">
                 <div class='uil-default-css' style='transform: scale(0.9); background-color: #ffffff; border-radius: 15px;'>
                     <div style='top: 80px; left: 93px; width: 14px; height: 40px; background: #00b2ff; -webkit-transform: rotate(0deg) translate(0,-60px); transform: rotate(0deg) translate(0,-60px); border-radius: 10px; position: absolute;'></div>

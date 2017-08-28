@@ -71,13 +71,22 @@ namespace GNHClientUI
             //});
 
             FoodMajorNutrients objFoodNutrients = new FoodMajorNutrients();
-            objFoodNutrients.foodID = dtFoodNutrients.Rows[0]["FoodID"].ToString();
-            objFoodNutrients.foodName = dtFoodNutrients.Rows[0]["FoodName"].ToString();
-            objFoodNutrients.energy = dtFoodNutrients.Rows[0]["Energy"].ToString();
-            objFoodNutrients.protein = dtFoodNutrients.Rows[0]["Protein"].ToString();
-            objFoodNutrients.fat = dtFoodNutrients.Rows[0]["Fat"].ToString();
-            objFoodNutrients.fibre = dtFoodNutrients.Rows[0]["Fibre"].ToString();
-            objFoodNutrients.carbs = dtFoodNutrients.Rows[0]["Carbs"].ToString();
+
+            if (dtFoodNutrients.Rows.Count > 0)
+            {
+                objFoodNutrients.foodID = dtFoodNutrients.Rows[0]["FoodID"].ToString();
+                objFoodNutrients.foodName = dtFoodNutrients.Rows[0]["FoodName"].ToString();
+                objFoodNutrients.energy = dtFoodNutrients.Rows[0]["Energy"].ToString();
+                objFoodNutrients.protein = dtFoodNutrients.Rows[0]["Protein"].ToString();
+                objFoodNutrients.fat = dtFoodNutrients.Rows[0]["Fat"].ToString();
+                objFoodNutrients.fibre = dtFoodNutrients.Rows[0]["Fibre"].ToString();
+                objFoodNutrients.carbs = dtFoodNutrients.Rows[0]["Carbs"].ToString();
+            }
+            else
+            {
+                objFoodNutrients.foodID = "-1"; //Food doesn't exist
+            }
+
 
             return objFoodNutrients;
         }
@@ -498,7 +507,7 @@ namespace GNHClientUI
             sbSingleRecommendedDietDetailsTemplate.Append("                      <label class='label-block control-label text-left' for='txtTimePicker{{ MealName }}'>{{ MealName }}</label>");
             sbSingleRecommendedDietDetailsTemplate.Append("                          <div class='time-block'>");
             sbSingleRecommendedDietDetailsTemplate.Append("                              <div class='input-group bootstrap-timepicker'>");
-            sbSingleRecommendedDietDetailsTemplate.Append("                                  <input id='txtTimePicker{{ MealName }}' type='text' class='form-control' value='{{ MealTime }}' />");
+            sbSingleRecommendedDietDetailsTemplate.Append("                                  <input id='txtTimePicker{{ MealName }}' type='text' class='form-control' value='{{ MealTime }}' data-meal-name ='{{ MealName }}' data-meal-time ='{{ MealTime }}' />");
             sbSingleRecommendedDietDetailsTemplate.Append("                                      <span class='input-group-addon'>");
             sbSingleRecommendedDietDetailsTemplate.Append("                                          <i class='fa fa-clock-o bigger-110'></i>");
             sbSingleRecommendedDietDetailsTemplate.Append("                                      </span>");
@@ -562,6 +571,7 @@ namespace GNHClientUI
 
                     int rowCount = 100;
                     StringBuilder sbFoodTableRows = new StringBuilder();
+                    double[] foodNutrientsWeekTotal = { 0, 0, 0, 0, 0 }; //sequence is Energy,Protein,Fat,Fibre,Carbs
                     double[] foodNutrientsWeekdayTotal = { 0, 0, 0, 0, 0 }; //sequence is Energy,Protein,Fat,Fibre,Carbs
                     double[] foodNutrientsWeekendTotal = { 0, 0, 0, 0, 0 }; //sequence is Energy,Protein,Fat,Fibre,Carbs
 
@@ -572,6 +582,17 @@ namespace GNHClientUI
                         //Calculating day wise total
                         for (int i = 0; i <= 6; i++)
                         {
+                            //week total
+                            if (tmpConsumptionDays[i] == '1')
+                            {
+                                foodNutrientsWeekTotal[0] += itemMealFoodDetails.Energy;
+                                foodNutrientsWeekTotal[1] += itemMealFoodDetails.Protein;
+                                foodNutrientsWeekTotal[2] += itemMealFoodDetails.Fat;
+                                foodNutrientsWeekTotal[3] += itemMealFoodDetails.Fibre;
+                                foodNutrientsWeekTotal[4] += itemMealFoodDetails.Carbs;
+                            }
+
+                            //weekday total
                             if (tmpConsumptionDays[i] == '1' && i <= 4)
                             {
                                 foodNutrientsWeekdayTotal[0] += itemMealFoodDetails.Energy;
@@ -581,6 +602,7 @@ namespace GNHClientUI
                                 foodNutrientsWeekdayTotal[4] += itemMealFoodDetails.Carbs;
                             }
 
+                            //weekend total
                             if (tmpConsumptionDays[i] == '1' && i > 4)
                             {
                                 foodNutrientsWeekendTotal[0] += itemMealFoodDetails.Energy;
@@ -623,15 +645,28 @@ namespace GNHClientUI
                     sbFoodTableTemplate.Append("        </tbody>");
                     sbFoodTableTemplate.Append("        <tfoot>");
 
+                    //week average
+                    sbFoodTableTemplate.Append("            <tr class='totalRow'>");
+                    sbFoodTableTemplate.Append("                <td colspan='2'></td>");
+                    sbFoodTableTemplate.Append("                <td colspan='3'>Average for week</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[0] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[1] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[2] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[3] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[4] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
+                    sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
+                    sbFoodTableTemplate.Append("            </tr>");
+
                     //week day average
                     sbFoodTableTemplate.Append("            <tr class='totalRow'>");
                     sbFoodTableTemplate.Append("                <td colspan='2'></td>");
                     sbFoodTableTemplate.Append("                <td colspan='3'>Average for weekdays</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[0] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[1] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[2] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[3] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[4] / 5) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[0] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[1] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[2] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[3] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[4] / 5), 2) + "</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("            </tr>");
@@ -640,11 +675,11 @@ namespace GNHClientUI
                     sbFoodTableTemplate.Append("            <tr class='totalRow'>");
                     sbFoodTableTemplate.Append("                <td colspan='2'></td>");
                     sbFoodTableTemplate.Append("                <td colspan='3'>Average for weekends</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[0] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[1] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[2] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[3] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[4] / 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[0] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[1] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[2] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[3] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[4] / 2), 2) + "</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("            </tr>");
@@ -778,7 +813,7 @@ namespace GNHClientUI
             sbSingleRecallDietDetailsTemplate.Append("                      <label class='label-block control-label text-left' for='txtTimePicker{{ MealName }}'>{{ MealName }}</label>");
             sbSingleRecallDietDetailsTemplate.Append("                          <div class='time-block'>");
             sbSingleRecallDietDetailsTemplate.Append("                              <div class='input-group bootstrap-timepicker'>");
-            sbSingleRecallDietDetailsTemplate.Append("                                  <input id='txtTimePicker{{ MealName }}' type='text' class='form-control' value='{{ MealTime }}' />");
+            sbSingleRecallDietDetailsTemplate.Append("                                  <input id='txtTimePicker{{ MealName }}' type='text' class='form-control' value='{{ MealTime }}' data-meal-name ='{{ MealName }}' data-meal-time ='{{ MealTime }}'  />");
             sbSingleRecallDietDetailsTemplate.Append("                                      <span class='input-group-addon'>");
             sbSingleRecallDietDetailsTemplate.Append("                                          <i class='fa fa-clock-o bigger-110'></i>");
             sbSingleRecallDietDetailsTemplate.Append("                                      </span>");
@@ -829,7 +864,7 @@ namespace GNHClientUI
                 foreach (MealDetails itemMealDetails in itemRecallDietDetails.MealDetails)
                 {
                     mealName = itemMealDetails.MealName;
-                    mealTime = itemMealDetails.Time.ToString("HH:mm");
+                    mealTime = itemMealDetails.Time.ToString("H:mm");
                     mealDays = GetDaysTemplateForMealRecall(mealName, itemMealDetails.Days);
 
                     if (RecallDiet48HourMeals.Contains(mealName))
@@ -843,6 +878,7 @@ namespace GNHClientUI
 
                     int rowCount = 100;
                     StringBuilder sbFoodTableRows = new StringBuilder();
+                    double[] foodNutrientsWeekTotal = { 0, 0, 0, 0, 0 }; //sequence is Energy,Protein,Fat,Fibre,Carbs
                     double[] foodNutrientsWeekdayTotal = { 0, 0, 0, 0, 0 }; //sequence is Energy,Protein,Fat,Fibre,Carbs
                     double[] foodNutrientsWeekendTotal = { 0, 0, 0, 0, 0 }; //sequence is Energy,Protein,Fat,Fibre,Carbs
 
@@ -853,6 +889,17 @@ namespace GNHClientUI
                         //Calculating day wise total
                         for (int i = 0; i <= 6; i++)
                         {
+                            //week total
+                            if (tmpConsumptionDays[i] == '1')
+                            {
+                                foodNutrientsWeekTotal[0] += itemMealFoodDetails.Energy;
+                                foodNutrientsWeekTotal[1] += itemMealFoodDetails.Protein;
+                                foodNutrientsWeekTotal[2] += itemMealFoodDetails.Fat;
+                                foodNutrientsWeekTotal[3] += itemMealFoodDetails.Fibre;
+                                foodNutrientsWeekTotal[4] += itemMealFoodDetails.Carbs;
+                            }
+
+                            //weekday total
                             if (tmpConsumptionDays[i] == '1' && i <= 4)
                             {
                                 foodNutrientsWeekdayTotal[0] += itemMealFoodDetails.Energy;
@@ -862,6 +909,7 @@ namespace GNHClientUI
                                 foodNutrientsWeekdayTotal[4] += itemMealFoodDetails.Carbs;
                             }
 
+                            //weekend total
                             if (tmpConsumptionDays[i] == '1' && i > 4)
                             {
                                 foodNutrientsWeekendTotal[0] += itemMealFoodDetails.Energy;
@@ -904,15 +952,28 @@ namespace GNHClientUI
                     sbFoodTableTemplate.Append("        </tbody>");
                     sbFoodTableTemplate.Append("        <tfoot>");
 
+                    //week average
+                    sbFoodTableTemplate.Append("            <tr class='totalRow'>");
+                    sbFoodTableTemplate.Append("                <td colspan='2'></td>");
+                    sbFoodTableTemplate.Append("                <td colspan='3'>Average for week</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[0] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[1] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[2] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[3] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol week'>" + Math.Round((foodNutrientsWeekTotal[4] / 7), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
+                    sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
+                    sbFoodTableTemplate.Append("            </tr>");
+
                     //week day average
                     sbFoodTableTemplate.Append("            <tr class='totalRow'>");
                     sbFoodTableTemplate.Append("                <td colspan='2'></td>");
                     sbFoodTableTemplate.Append("                <td colspan='3'>Average for weekdays</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[0] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[1] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[2] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[3] / 5) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + (foodNutrientsWeekdayTotal[4] / 5) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[0] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[1] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[2] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[3] / 5), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekday'>" + Math.Round((foodNutrientsWeekdayTotal[4] / 5), 2) + "</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("            </tr>");
@@ -921,11 +982,11 @@ namespace GNHClientUI
                     sbFoodTableTemplate.Append("            <tr class='totalRow'>");
                     sbFoodTableTemplate.Append("                <td colspan='2'></td>");
                     sbFoodTableTemplate.Append("                <td colspan='3'>Average for weekends</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[0] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[1] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[2] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[3] / 2) + "</td>");
-                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + (foodNutrientsWeekendTotal[4] / 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[0] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[1] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[2] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[3] / 2), 2) + "</td>");
+                    sbFoodTableTemplate.Append("                <td class='totalCol weekend'>" + Math.Round((foodNutrientsWeekendTotal[4] / 2), 2) + "</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("                <td>&nbsp;</td>");
                     sbFoodTableTemplate.Append("            </tr>");

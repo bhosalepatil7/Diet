@@ -24,3 +24,7 @@ D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Model\bin\Debug\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Model\obj\Debug\Diet.Business.Model.pdb

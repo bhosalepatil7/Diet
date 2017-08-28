@@ -7,15 +7,13 @@
         .table {
             border-bottom: 0px !important;
         }
-
-            .table th, .table td {
+                   .table th, .table td {
                 border: 0px !important;
             }
 
         .fixed-table-container {
             border: 0px !important;
         }
-
         .nopadding {
             padding: 2px !important;
             margin: 2px !important;
@@ -63,7 +61,8 @@
                         <asp:DropDownList runat="server" ID="ddlSearch" OnSelectedIndexChanged="ddlSearch_SelectedIndexChanged" TabIndex="1" CssClass="form-control">
                             <asp:ListItem Selected="True">ALL</asp:ListItem>
                             <asp:ListItem>ID</asp:ListItem>
-                            <asp:ListItem>Name</asp:ListItem>
+                            <asp:ListItem>FIRSTNAME</asp:ListItem>
+                            <asp:ListItem>LASTNAME</asp:ListItem>
                             <asp:ListItem>Email</asp:ListItem>
                             <asp:ListItem>Contact</asp:ListItem>
                         </asp:DropDownList>

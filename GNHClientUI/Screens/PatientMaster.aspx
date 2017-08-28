@@ -6,11 +6,9 @@
 <%@ Register TagPrefix="UC" TagName="Recommend" Src="~/UserControl/RecommendedDiet.ascx" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder3" runat="Server">
     <link href="../css/intlTelInput.css" rel="stylesheet" />
-    <%--<script src="http://code.jquery.com/jquery-1.12.3.min.js"></script>--%>
+    
     <script src="../assets/js/jquery.js"></script>
-    <script src="../Scripts/intlTelInput.js?v=2017082401"></script>
-    <script src="../Scripts/isValidNumber.js?v=2017082401"></script>
-    <%--<script src="../Scripts/jquery-1.12.0.js"></script>--%>
+    <script src="../Scripts/phone-format.js?v=2017082606"></script>      
     <script src="../assets/js/jquery-ui.custom.js"></script>
     <script src="../assets/js/jquery.ui.touch-punch.js"></script>
     <script src="../assets/js/chosen.jquery.js"></script>
@@ -21,10 +19,8 @@
     <script src="../assets/js/jquery.maskedinput.js"></script>
     <script src="../assets/js/jquery.addnew.js"></script>
     <script src="../Scripts/gnh-converter.js"></script>
-    <script src="../Scripts/RecallDiet.js?v=2017081801"></script>
-    <script src="../Scripts/RecommendedDiet.js?v=2017081801"></script>
-    <%--    <script src="../Scripts/js/jquery.dateselect.js"></script>
-	<link href="../Scripts/css/jquery.dateselect.css" rel="stylesheet" type="text/css" />--%>
+    <script src="../Scripts/RecallDiet.js?v=2017082705"></script>
+    <script src="../Scripts/RecommendedDiet.js?v=2017082705"></script>
     <style type="text/css">
         .table {
             border-bottom: 0px !important;
@@ -380,14 +376,36 @@
 
 
         function ValidateMobileOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            debugger;
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            args.IsValid = isValidNumberForRegion(txtMobile.val(), aCountryCode);
         }
 
         function ValidateLandlineOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+            args.IsValid = isValidNumberForRegion(txtLandline.val(), aCountryCode);
         }
+
+        function SetExampleMobileLandlineNumber() {
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+
+            txtMobile.attr('placeholder', exampleMobileNumber(aCountryCode));
+            txtLandline.attr('placeholder', exampleLandlineNumber(aCountryCode));
+        }
+
+        function pageLoad(sender, args) {
+            $(document).ready(function () {
+                SetExampleMobileLandlineNumber();
+            });
+        }
+
 
         function SetTabs() {
 
@@ -503,6 +521,17 @@
                         minuteStep: 1,
                         showSeconds: false,
                         showMeridian: false
+                    }).on("changeTime.timepicker", function (e) {
+                        debugger;
+                        var MealId = $(this).data().mealName;
+                        var prevMealTime = $(this).attr('data-meal-time');
+                        var newMealTime = e.time.value;
+                        //console.log('' + MealId + ' New Meal Time - ' + newMealTime + ' Old Meal Time - ' + prevMealTime);
+                        if (prevMealTime != newMealTime) {
+                            changeRecommendedMealTime(MealId);
+                            $(this).attr('data-meal-time', newMealTime);
+                            $(this).attr('value', newMealTime);
+                        }
                     }).next().on(ace.click_event, function () {
                         $(this).prev().focus();
                     });
@@ -584,12 +613,25 @@
                     });
 
                     $("#RecallDietSection input[id*='txtTimePickerMeal']").timepicker({
+                        //onSelect: function (d,i) { console.log('Hi'+i.lastVal());},
                         minuteStep: 1,
                         showSeconds: false,
                         showMeridian: false
+                    }).on("changeTime.timepicker", function (e) {
+                        debugger;
+                        var MealId = $(this).data().mealName;
+                        var prevMealTime = $(this).attr('data-meal-time');
+                        var newMealTime = e.time.value;
+                        //console.log('' + MealId + ' New Meal Time - ' + newMealTime + ' Old Meal Time - ' + prevMealTime);
+                        if (prevMealTime != newMealTime) {
+                            changeRecallMealTime(MealId);
+                            $(this).attr('data-meal-time', newMealTime);
+                            $(this).attr('value', newMealTime);
+                        }
                     }).next().on(ace.click_event, function () {
                         $(this).prev().focus();
                     });
+
 
                     ////////
                 }
@@ -1244,8 +1286,8 @@ function IBW() {
             }
         }
     document.getElementById('<%=txtBMR.ClientID %>').value = BMR;
-		    if (document.getElementById('<%=txtFatPer.ClientID %>').value == '' || document.getElementById('<%=txtFatPer.ClientID %>').value == '0.00')
-		        document.getElementById('<%=txtFatPer.ClientID %>').value = BMR;
+		    <%--if (document.getElementById('<%=txtFatPer.ClientID %>').value == '' || document.getElementById('<%=txtFatPer.ClientID %>').value == '0.00')
+		        document.getElementById('<%=txtFatPer.ClientID %>').value = BMR;--%>
             document.getElementById('<%=txtCalorie.ClientID %>').value = CALORIE;
 		    document.getElementById('<%=txtCalorie1.ClientID %>').value = CALORIE;
 		    if (document.getElementById('<%=txtCalorie2.ClientID %>').value == '')
@@ -1562,7 +1604,7 @@ function IBW() {
 											<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
-                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit" OnServerValidate="MobileNumberValidate"></asp:CustomValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1572,7 +1614,7 @@ function IBW() {
 											<%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
 											<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
-                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit" OnServerValidate="LandlineNumberValidate"></asp:CustomValidator>
                                         <%--</div>--%>
                                     </div>
                                 </div>
@@ -2783,9 +2825,9 @@ function IBW() {
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-4 control-label text-right">Sleep Hours Per Day</label>
                                     <div class="col-sm-8  control-block">
-                                        <asp:TextBox CssClass="form-control" runat="server" ID="txtSleep" TabIndex="10" autocomplete="off" PlaceHolder="NN/NN"></asp:TextBox>
+                                        <asp:TextBox CssClass="form-control" runat="server" ID="txtSleep" TabIndex="10" autocomplete="off"></asp:TextBox>
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator45" runat="server" ErrorMessage="ExerciseDetail  Required" Display="Dynamic" ControlToValidate="txtExerciseDetail" ValidationGroup="validationGroup4" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator42" runat="server" ErrorMessage="Invalid Sleep Details" Display="Dynamic" ControlToValidate="txtSleep" ValidationGroup="validationGroup4" ForeColor="Red" ValidationExpression="^\d{1,2}\/\d{1,2}$"></asp:RegularExpressionValidator>
+                                        <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator42" runat="server" ErrorMessage="Invalid Sleep Details" Display="Dynamic" ControlToValidate="txtSleep" ValidationGroup="validationGroup4" ForeColor="Red" ValidationExpression="^\d{1,2}\/\d{1,2}$"></asp:RegularExpressionValidator>--%>
                                     </div>
                                 </div>
 

@@ -50,16 +50,16 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
-            $("body").keydown(function (event) {
-                switch (event.which) {
-                    case 37: //Arrow left
-                        $('.nav-tabs > .active').prev('li').find('a.lnk').trigger('click');
-                        break;
-                    case 39: //Arrow left
-                        $('.nav-tabs > .active').next('li').find('a.lnk').trigger('click');
-                        break;
-                }
-            });
+            //$("body").keydown(function (event) {
+            //    switch (event.which) {
+            //        case 37: //Arrow left
+            //            $('.nav-tabs > .active').prev('li').find('a.lnk').trigger('click');
+            //            break;
+            //        case 39: //Arrow left
+            //            $('.nav-tabs > .active').next('li').find('a.lnk').trigger('click');
+            //            break;
+            //    }
+            //});
 
             SetTabs();
             var prm = Sys.WebForms.PageRequestManager.getInstance();

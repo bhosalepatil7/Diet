@@ -26,3 +26,10 @@ D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.csprojResolveAssemblyReference.cache
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.dll
 D:\Intrepidians\Diet Project\Diet_20160422_1\Diet_20160422_1\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.pdb
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.dll
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Contract.pdb
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.dll
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Contract\bin\Release\Diet.Business.Model.pdb
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.csprojResolveAssemblyReference.cache
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.dll
+D:\Intrepidians\Diet Project\Project\Diet\Diet.Business.Contract\obj\Release\Diet.Business.Contract.pdb

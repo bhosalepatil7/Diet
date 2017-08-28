@@ -6,8 +6,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder3" runat="server">
     <link href="../css/intlTelInput.css" rel="stylesheet" />
     <script src="../assets/js/jquery.js"></script>
-    <script src="../Scripts/intlTelInput.js?v=2017082401"></script>
-    <script src="../Scripts/isValidNumber.js?v=2017082401"></script>
+    <script src="../Scripts/phone-format.js?v=2017082606"></script>   
     <script src="../assets/js/jquery-ui.custom.js"></script>
     <script src="../assets/js/jquery.ui.touch-punch.js"></script>
     <script src="../assets/js/chosen.jquery.js"></script>
@@ -18,6 +17,7 @@
     <script src="../assets/js/jquery.maskedinput.js"></script>
     <script src="../assets/js/jquery.addnew.js"></script>
     <script src="../Scripts/gnh-converter.js"></script>
+
     <style type="text/css">
         .table {
             border-bottom: 0px !important;
@@ -328,35 +328,35 @@
             //    }
             //});
             //swal('Alert', 'Client details are not saved');
-            $(document).keydown(function (e) {
+            //$(document).keydown(function (e) {
 
-                // Set self as the current item in focus
-                var self = $(':focus'),
-                    // Set the form by the current item in focus
-                    form = self.parents('form:eq(0)'),
-                    focusable;
+            //    // Set self as the current item in focus
+            //    var self = $(':focus'),
+            //        // Set the form by the current item in focus
+            //        form = self.parents('form:eq(0)'),
+            //        focusable;
 
-                // Array of Indexable/Tab-able items
-                focusable = form.find('input,a,select,button,textarea').filter(':visible');
+            //    // Array of Indexable/Tab-able items
+            //    focusable = form.find('input,a,select,button,textarea').filter(':visible');
 
-                function enterKey() {
-                    if (e.which === 13) { // [Enter] key!self.is('textarea'
+            //    function enterKey() {
+            //        if (e.which === 13) { // [Enter] key!self.is('textarea'
 
-                        // If not a regular hyperlink/button/textarea
-                        if ($.inArray(self, focusable) && (!self.is('a')) && (!self.is('button'))) {
-                            // Then prevent the default [Enter] key behaviour from submitting the form
-                            e.preventDefault();
-                        } // Otherwise follow the link/button as by design, or put new line in textarea
+            //            // If not a regular hyperlink/button/textarea
+            //            if ($.inArray(self, focusable) && (!self.is('a')) && (!self.is('button'))) {
+            //                // Then prevent the default [Enter] key behaviour from submitting the form
+            //                e.preventDefault();
+            //            } // Otherwise follow the link/button as by design, or put new line in textarea
 
-                        // Focus on the next item (either previous or next depending on shift)
-                        focusable.eq(focusable.index(self) + (e.shiftKey ? -1 : 1)).focus();
+            //            // Focus on the next item (either previous or next depending on shift)
+            //            focusable.eq(focusable.index(self) + (e.shiftKey ? -1 : 1)).focus();
 
-                        return false;
-                    }
-                }
-                // We need to capture the [Shift] key and check the [Enter] key either way.
-                if (e.shiftKey) { enterKey() } else { enterKey() }
-            });
+            //            return false;
+            //        }
+            //    }
+            //    // We need to capture the [Shift] key and check the [Enter] key either way.
+            //    if (e.shiftKey) { enterKey() } else { enterKey() }
+            //});
 
             //$('#ContentPlaceHolder1_ContentPlaceHolder3_txtDOB').click(function () {
             //    alert(2);
@@ -371,19 +371,54 @@
                 });
             };
         });
-
         function ValidateMobileOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            debugger;
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            args.IsValid = isValidNumberForRegion(txtMobile.val(), aCountryCode);
         }
 
         function ValidateLandlineOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+            args.IsValid = isValidNumberForRegion(txtLandline.val(), aCountryCode);
+        }
+
+        function SetExampleMobileLandlineNumber() {
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+
+            txtMobile.attr('placeholder', exampleMobileNumber(aCountryCode));
+            txtLandline.attr('placeholder', exampleLandlineNumber(aCountryCode));
+        }
+
+        function pageLoad(sender, args) {
+            $(document).ready(function () {
+                SetExampleMobileLandlineNumber();
+            });
         }
 
 
+
         function SetTabs() {
+
+            $("textarea").on("keydown", function (e) {
+                var key = e.keyCode;
+                debugger;
+                // If the user has pressed enter
+                if (key === 13) {
+                    $(this)[0].value = '' + $(this)[0].value + '\n';
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+
             if ($("[id='ContentPlaceHolder1_ContentPlaceHolder3_TabName']").val() == "") {
                 $("[id='ContentPlaceHolder1_ContentPlaceHolder3_TabName']").val('tabs-1');
             }
@@ -712,7 +747,7 @@ function IBW() {
             }
             else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
                 // Height over 5' 5"
-                if (Height > 5.5) {
+                if (Height >= 5.5) {
                     // Small = wrist size 5.5" to 6.5"
                     if (Wrist >= 5.5 && Wrist < 6.5) {
                         bodyFrame = "small";
@@ -944,7 +979,7 @@ function IBW() {
                                         <asp:TextBox ID="txtPatientID" CssClass="form-control" runat="server" TabIndex="1" Enabled="false" autocomplete="off" Visible="false"></asp:TextBox>
                                         <asp:TextBox ID="txtName" CssClass="form-control" runat="server" TabIndex="2" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator1" runat="server" ErrorMessage="Client Name Required" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -952,7 +987,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtMiddleName" runat="server" TabIndex="3" autocomplete="off"></asp:TextBox>
                                         <%--                                    <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator2" runat="server" ErrorMessage="Client Middle Name Required" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -960,7 +995,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtLastName" runat="server" TabIndex="4" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator3" runat="server" ErrorMessage="Client LastName  Required" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1072,7 +1107,7 @@ function IBW() {
                                             <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
-                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit" OnServerValidate="MobileNumberValidate"></asp:CustomValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1083,7 +1118,7 @@ function IBW() {
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
                                         <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
-                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit" OnServerValidate="LandlineNumberValidate"></asp:CustomValidator>
 
                                     </div>
                                 </div>

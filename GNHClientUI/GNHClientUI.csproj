@@ -55,6 +55,9 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="PhoneNumbers">
+      <HintPath>..\packages\libphonenumber-csharp.8.8.0\lib\net40\PhoneNumbers.dll</HintPath>
+    </Reference>
     <Reference Include="PNayak.Web.UI.WebControls.ExportButton, Version=1.0.0.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Helper\PNayak.Web.UI.WebControls.ExportButton.dll</HintPath>
@@ -1085,6 +1088,8 @@
     <Content Include="Scripts\CastleBusyBox.js" />
     <Content Include="Scripts\css\jquery.dateselect.css" />
     <Content Include="Scripts\gnh-converter.js" />
+    <Content Include="Scripts\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Scripts\images\ui-bg_glass_75_dadada_1x400.png" />
     <Content Include="Scripts\intlTelInput.css" />
     <Content Include="Scripts\intlTelInput.js" />
     <Content Include="Scripts\intlTelInput.min.js" />
@@ -1106,6 +1111,7 @@
     <Content Include="Scripts\notify.js" />
     <Content Include="Scripts\notify.min.js" />
     <Content Include="Scripts\Pagination.css" />
+    <Content Include="Scripts\phone-format.js" />
     <Content Include="Scripts\RecallDiet.js" />
     <Content Include="Scripts\RecommendedDiet.js" />
     <Content Include="Scripts\simple-modal.css" />

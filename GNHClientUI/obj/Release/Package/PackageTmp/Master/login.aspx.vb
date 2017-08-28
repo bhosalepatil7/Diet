@@ -290,12 +290,12 @@ Partial Class Master_login
 
         Session("UserCode") = Login.UserName.ToUpper
         'THIRTY_DAYS()
-        Dim cmd2 As New SqlCommand("select GROUP_ID from admin_maps_user_master where user_name=@UserName", conn)
-        cmd2.Parameters.AddWithValue("UserName", Login.UserName.ToUpper)
-        If conn.State = ConnectionState.Closed Then conn.Open()
-        Session("GROUPID") = cmd2.ExecuteScalar
-        cmd.Parameters.Clear()
-        If conn.State = ConnectionState.Open Then conn.Close()
+        'Dim cmd2 As New SqlCommand("select GROUP_ID from admin_maps_user_master where user_name=@UserName", conn)
+        'cmd2.Parameters.AddWithValue("UserName", Login.UserName.ToUpper)
+        'If conn.State = ConnectionState.Closed Then conn.Open()
+        'Session("GROUPID") = cmd2.ExecuteScalar
+        'cmd.Parameters.Clear()
+        'If conn.State = ConnectionState.Open Then conn.Close()
         Session("SelectedNode") = ""
 
         'RegenerateID();

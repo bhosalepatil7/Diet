@@ -7,8 +7,7 @@
 		  <link rel="stylesheet" href="../assets/css/ace-ie.min.css" />
 		<![endif]-->
     <script src="../assets/js/jquery.js"></script>
-    <script src="../Scripts/intlTelInput.js?v=2017082401"></script>
-    <script src="../Scripts/isValidNumber.js?v=2017082401"></script>
+    <script src="../Scripts/phone-format.js?v=2017082606"></script>  
     <script src="../assets/js/jquery-ui.custom.js"></script>
     <script src="../assets/js/jquery.ui.touch-punch.js"></script>
     <script src="../assets/js/chosen.jquery.js"></script>
@@ -328,38 +327,38 @@
             //        case 39: //Arrow left
             //            $('.nav-tabs > .active').next('li').find('a').trigger('click');
             //            break;
-            //    }
+            //    } 
             //});
             //swal('Alert', 'Client details are not saved');
-            $(document).keydown(function (e) {
+            //$(document).keydown(function (e) {
 
-                // Set self as the current item in focus
-                var self = $(':focus'),
-                    // Set the form by the current item in focus
-                    form = self.parents('form:eq(0)'),
-                    focusable;
+            //    // Set self as the current item in focus
+            //    var self = $(':focus'),
+            //        // Set the form by the current item in focus
+            //        form = self.parents('form:eq(0)'),
+            //        focusable;
 
-                // Array of Indexable/Tab-able items
-                focusable = form.find('input,a,select,button,textarea').filter(':visible');
+            //    // Array of Indexable/Tab-able items
+            //    focusable = form.find('input,a,select,button,textarea').filter(':visible');
 
-                function enterKey() {
-                    if (e.which === 13) { // [Enter] key!self.is('textarea'
+            //    function enterKey() {
+            //        if (e.which === 13) { // [Enter] key!self.is('textarea'
 
-                        // If not a regular hyperlink/button/textarea
-                        if ($.inArray(self, focusable) && (!self.is('a')) && (!self.is('button'))) {
-                            // Then prevent the default [Enter] key behaviour from submitting the form
-                            e.preventDefault();
-                        } // Otherwise follow the link/button as by design, or put new line in textarea
+            //            // If not a regular hyperlink/button/textarea
+            //            if ($.inArray(self, focusable) && (!self.is('a')) && (!self.is('button'))) {
+            //                // Then prevent the default [Enter] key behaviour from submitting the form
+            //                e.preventDefault();
+            //            } // Otherwise follow the link/button as by design, or put new line in textarea
 
-                        // Focus on the next item (either previous or next depending on shift)
-                        focusable.eq(focusable.index(self) + (e.shiftKey ? -1 : 1)).focus();
+            //            // Focus on the next item (either previous or next depending on shift)
+            //            focusable.eq(focusable.index(self) + (e.shiftKey ? -1 : 1)).focus();
 
-                        return false;
-                    }
-                }
-                // We need to capture the [Shift] key and check the [Enter] key either way.
-                if (e.shiftKey) { enterKey() } else { enterKey() }
-            });
+            //            return false;
+            //        }
+            //    }
+            //    // We need to capture the [Shift] key and check the [Enter] key either way.
+            //    if (e.shiftKey) { enterKey() } else { enterKey() }
+            //});
 
             //$('#ContentPlaceHolder1_ContentPlaceHolder3_txtDOB').click(function () {
             //    alert(2);
@@ -376,16 +375,52 @@
         });
 
         function ValidateMobileOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            debugger;
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            args.IsValid = isValidNumberForRegion(txtMobile.val(), aCountryCode);
         }
 
         function ValidateLandlineOnSubmit(oSrc, args) {
-            var telInput = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
-            args.IsValid = telInput.intlTelInput("isValidNumber");
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+            args.IsValid = isValidNumberForRegion(txtLandline.val(), aCountryCode);
         }
 
+        function SetExampleMobileLandlineNumber() {
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+
+            txtMobile.attr('placeholder', exampleMobileNumber(aCountryCode));
+            txtLandline.attr('placeholder', exampleLandlineNumber(aCountryCode));
+        }
+
+        function pageLoad(sender, args) {
+            $(document).ready(function () {
+                SetExampleMobileLandlineNumber();
+            });
+        }
+
+
         function SetTabs() {
+
+            $("textarea").on("keydown", function (e) {
+                var key = e.keyCode;
+                debugger;
+                // If the user has pressed enter
+                if (key === 13) {
+                    $(this)[0].value = '' + $(this)[0].value + '\n';
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+
             if ($("[id='ContentPlaceHolder1_ContentPlaceHolder3_TabName']").val() == "") {
                 $("[id='ContentPlaceHolder1_ContentPlaceHolder3_TabName']").val('tabs-1');
             }
@@ -401,6 +436,14 @@
                 format: 'dd/mm/yyyy'
             }).mask('99/99/9999');
 
+            $('#<%= txtNotes.ClientID %>').keydown(function (e) {
+                if (event.which || event.keyCode) {
+                    if ((event.which == 13) || (event.keyCode == 13))
+                        return false;                    
+                }
+                else { return true };
+            });           
+
             var age = document.getElementById('<%=txtAge.ClientID %>').value;
             if (age < 18)
                 $('div .child').css('display', 'block');
@@ -409,36 +452,36 @@
 
 
             $('#<%= ddlGender.ClientID %>').change(function () {
-                if ($(this).val() == 'Male') {
-                    $('div .gender').css('display', 'none');
-                }
-                else {
-                    $('div .gender').css('display', 'block');
-                }
-            });
+                    if ($(this).val() == 'Male') {
+                        $('div .gender').css('display', 'none');
+                    }
+                    else {
+                        $('div .gender').css('display', 'block');
+                    }
+                });
 
-            if ($('#<%= ddlGender.ClientID %>').val() == 'Male')
+                if ($('#<%= ddlGender.ClientID %>').val() == 'Male')
                 $('div .gender').css('display', 'none');
             else
                 $('div .gender').css('display', 'block');
 
             if ($('#<%= ddlProfession.ClientID %>').val() == 'Other,Specify')
                 $('#<%=txtProfessionOthers.ClientID %>').css('display', 'block');
-            else
-                $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
+                else
+                    $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
 
 
-            $('#<%= ddlProfession.ClientID %>').change(function () {
+                $('#<%= ddlProfession.ClientID %>').change(function () {
                 if ($(this).val() == 'Other,Specify') {
 
                     $('#<%=txtProfessionOthers.ClientID %>').css('display', 'block');
-                }
-                else {
-                    $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
-                }
-            });
+                    }
+                    else {
+                        $('#<%=txtProfessionOthers.ClientID %>').css('display', 'none');
+                    }
+                });
 
-            $('#<%= txtBloodPressure.ClientID %>').mask('999/999');
+                $('#<%= txtBloodPressure.ClientID %>').mask('999/999');
 
             if ($('#<%= ddlThyroid.ClientID %>').val() == 'No')
                 $('div .NoThyroid').css('display', 'none');
@@ -479,28 +522,28 @@
             // ****************      Calculated BMI             **************
 
             var Height = document.getElementById('<%=txtHeight.ClientID %>').value;
-            var weight = document.getElementById('<%=txtWeight.ClientID %>').value;
+                var weight = document.getElementById('<%=txtWeight.ClientID %>').value;
 
-            var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
-            var WeightBaseUnit = document.getElementById('<%=ddlWeightUnit.ClientID %>').value;
+                var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
+                var WeightBaseUnit = document.getElementById('<%=ddlWeightUnit.ClientID %>').value;
 
-            var sex = document.getElementById('<%=ddlGender.ClientID %>').value;
+                var sex = document.getElementById('<%=ddlGender.ClientID %>').value;
 
 
-            if (weight == '') {
-                //  alert('Please enter weight for BMI calculations');
+                if (weight == '') {
+                    //  alert('Please enter weight for BMI calculations');
 
-            }
-            else if (Height == '') {
-                //  alert('Please enter Height for BMI calculations');
-            }
+                }
+                else if (Height == '') {
+                    //  alert('Please enter Height for BMI calculations');
+                }
 
-            else {
+                else {
 
-                Height = ConvertToMeters(Height, HeightBaseUnit); // Convert height from baseUnit to meter
-                weight = ConvertToKgs(weight, WeightBaseUnit);
+                    Height = ConvertToMeters(Height, HeightBaseUnit); // Convert height from baseUnit to meter
+                    weight = ConvertToKgs(weight, WeightBaseUnit);
 
-                var BMI = (weight / (Height * Height)).toFixed(2); //Roundoff to two decimals
+                    var BMI = (weight / (Height * Height)).toFixed(2); //Roundoff to two decimals
              <%--   document.getElementById('<%=txtBMI.ClientID %>').disabled = false;--%>
                 document.getElementById('<%=txtBMI.ClientID %>').value = BMI;
 <%--                document.getElementById('<%=txtBMI.ClientID %>').disabled = true;--%>
@@ -562,13 +605,13 @@ function IBW() {
     var wt;
 
     if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Select') {
-        // alert('Please select gender IBW.');
-    }
-    else if (document.getElementById('<%=txtHeight.ClientID %>').value == '') {
-        //  alert('Please enter Height IBW'); 
-    }
-    else {
-        if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
+            // alert('Please select gender IBW.');
+        }
+        else if (document.getElementById('<%=txtHeight.ClientID %>').value == '') {
+            //  alert('Please enter Height IBW'); 
+        }
+        else {
+            if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
 
             gender = 'Male';
             // alert(gender);
@@ -620,7 +663,7 @@ function IBW() {
     }
 
 
-}
+    }
         /*
          Body Frame calculation
         
@@ -656,15 +699,15 @@ function IBW() {
             var bodyFrame = "unavailable";
 
             var Height = document.getElementById('<%=txtHeight.ClientID %>').value;
-            var Wrist = document.getElementById('<%=txtwrist.ClientID %>').value;
+                var Wrist = document.getElementById('<%=txtwrist.ClientID %>').value;
 
-            var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
-            var WristBaseUnit = document.getElementById('<%=ddlWristUnit.ClientID %>').value;
+                var HeightBaseUnit = document.getElementById('<%=ddlHeightUnit.ClientID %>').value;
+                var WristBaseUnit = document.getElementById('<%=ddlWristUnit.ClientID %>').value;
 
-            Height = ConvertToFoots(Height, HeightBaseUnit);
-            Wrist = ConvertToInches(Wrist, WristBaseUnit);
+                Height = ConvertToFoots(Height, HeightBaseUnit);
+                Wrist = ConvertToInches(Wrist, WristBaseUnit);
 
-            if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
+                if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Female') {
 
                 // Height under 5'2"
                 if (Height < 5.2 && Height > 0) {
@@ -716,7 +759,7 @@ function IBW() {
             }
             else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
                 // Height over 5' 5"
-                if (Height > 5.5) {
+                if (Height >= 5.5) {
                     // Small = wrist size 5.5" to 6.5"
                     if (Wrist >= 5.5 && Wrist < 6.5) {
                         bodyFrame = "small";
@@ -732,24 +775,24 @@ function IBW() {
 
                 }
             }
-            //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = false;
-            document.getElementById('<%=txtBodyFrame.ClientID %>').value = bodyFrame;
-            //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = true;
+                //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = false;
+                document.getElementById('<%=txtBodyFrame.ClientID %>').value = bodyFrame;
+                //document.getElementById('<%=txtBodyFrame.ClientID %>').disabled = true;
 
-        }
+            }
         function CalculateAge() {
 
             var birthDay = document.getElementById('<%=txtDOB.ClientID %>').value;
 
-            var dateParts = birthDay.split("/");
+                var dateParts = birthDay.split("/");
 
-            var DOB = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+                var DOB = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
 
-            var today = new Date();
-            var age = today.getTime() - DOB.getTime();
-            age = Math.floor(age / (1000 * 60 * 60 * 24 * 365.25));
-            if (age != "NaN") {
-                document.getElementById('<%=txtAge.ClientID %>').value = age;
+                var today = new Date();
+                var age = today.getTime() - DOB.getTime();
+                age = Math.floor(age / (1000 * 60 * 60 * 24 * 365.25));
+                if (age != "NaN") {
+                    document.getElementById('<%=txtAge.ClientID %>').value = age;
                 if (age < 18)
                     $('div .child').css('display', 'block');
                 else
@@ -923,7 +966,7 @@ function IBW() {
                                         <asp:TextBox ID="txtPatientID" CssClass="form-control" runat="server" TabIndex="1" Enabled="false" autocomplete="off" Visible="false"></asp:TextBox>
                                         <asp:TextBox ID="txtName" CssClass="form-control" runat="server" TabIndex="2" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator1" runat="server" ErrorMessage="Client Name Required" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -931,7 +974,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtMiddleName" runat="server" TabIndex="3" autocomplete="off"></asp:TextBox>
                                         <%--                                    <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator2" runat="server" ErrorMessage="Client Middle Name Required" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -939,7 +982,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtLastName" runat="server" TabIndex="4" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator3" runat="server" ErrorMessage="Client LastName  Required" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1051,7 +1094,7 @@ function IBW() {
                                             <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
-                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit" OnServerValidate="MobileNumberValidate"></asp:CustomValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1061,7 +1104,7 @@ function IBW() {
                                             <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
                                             <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
-                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit"></asp:CustomValidator>
+                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit" OnServerValidate="LandlineNumberValidate"></asp:CustomValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">

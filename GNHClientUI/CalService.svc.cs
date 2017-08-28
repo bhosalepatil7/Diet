@@ -409,46 +409,58 @@ public class CalService
         CalendarData objCalData = new CalendarData();
         objCalData.events = new List<ArrayList>();
 
-        try
+        if (Convert.ToInt64(customerID) != 0)
         {
-            using (SqlConnection conn = new SqlConnection(connDietDB))
+            try
             {
-                using (SqlCommand cmd = new SqlCommand())
+                using (SqlConnection conn = new SqlConnection(connDietDB))
                 {
-                    if (conn.State == ConnectionState.Closed) conn.Open();
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        if (conn.State == ConnectionState.Closed) conn.Open();
 
-                    cmd.Connection = conn;
-                    cmd.CommandText = "update  dbo.jqcalendar set Subject=@Subject,StartTime=@StartTime,EndTime=@EndTime,IsAllDayEvent=@IsAllDayEvent,Location=@Location,Description=@Description,Color=@Color,CustID=@CustID,SessionCode=@SessionCode where Id=@Id";
-                    cmd.Parameters.Add("@Subject", SqlDbType.NVarChar).Value = sub;
-                    cmd.Parameters.Add("@StartTime", SqlDbType.DateTime).Value = (st != null) ? Convert.ToDateTime(st) : DateTime.UtcNow.AddHours(5.5);
-                    cmd.Parameters.Add("@EndTime", SqlDbType.DateTime).Value = (et != null) ? Convert.ToDateTime(et) : DateTime.UtcNow.AddHours(5.5);
-                    cmd.Parameters.Add("@IsAllDayEvent", SqlDbType.SmallInt).Value = Convert.ToInt16(ade);
+                        cmd.Connection = conn;
+                        cmd.CommandText = "update  dbo.jqcalendar set Subject=@Subject,StartTime=@StartTime,EndTime=@EndTime,IsAllDayEvent=@IsAllDayEvent,Location=@Location,Description=@Description,Color=@Color,CustID=@CustID,SessionCode=@SessionCode where Id=@Id";
+                        cmd.Parameters.Add("@Subject", SqlDbType.NVarChar).Value = sub;
+                        cmd.Parameters.Add("@StartTime", SqlDbType.DateTime).Value = (st != null) ? Convert.ToDateTime(st) : DateTime.UtcNow.AddHours(5.5);
+                        cmd.Parameters.Add("@EndTime", SqlDbType.DateTime).Value = (et != null) ? Convert.ToDateTime(et) : DateTime.UtcNow.AddHours(5.5);
+                        cmd.Parameters.Add("@IsAllDayEvent", SqlDbType.SmallInt).Value = Convert.ToInt16(ade);
 
-                    cmd.Parameters.Add("@Location", SqlDbType.NVarChar).Value = loc;
-                    cmd.Parameters.Add("@Description", SqlDbType.NVarChar).Value = dscr;
-                    cmd.Parameters.Add("@Color", SqlDbType.SmallInt).Value = Convert.ToInt16(color);
+                        cmd.Parameters.Add("@Location", SqlDbType.NVarChar).Value = loc;
+                        cmd.Parameters.Add("@Description", SqlDbType.NVarChar).Value = dscr;
+                        cmd.Parameters.Add("@Color", SqlDbType.SmallInt).Value = Convert.ToInt16(color);
 
-                    cmd.Parameters.Add("@CustID", SqlDbType.BigInt).Value = Convert.ToInt64(customerID);
-                    cmd.Parameters.Add("@SessionCode", SqlDbType.NVarChar).Value = Convert.ToString(HttpContext.Current.Session["UserCode"]);
-                    cmd.Parameters.Add("@Id", SqlDbType.Int).Value = Convert.ToInt16(id);
+                        cmd.Parameters.Add("@CustID", SqlDbType.BigInt).Value = Convert.ToInt64(customerID);
+                        cmd.Parameters.Add("@SessionCode", SqlDbType.NVarChar).Value = Convert.ToString(HttpContext.Current.Session["UserCode"]);
+                        cmd.Parameters.Add("@Id", SqlDbType.Int).Value = Convert.ToInt16(id);
 
-                    objCalData.Data = cmd.ExecuteNonQuery().ToString();
+                        objCalData.Data = cmd.ExecuteNonQuery().ToString();
 
-                    if (conn.State == ConnectionState.Open) conn.Close();
+                        if (conn.State == ConnectionState.Open) conn.Close();
+                    }
                 }
-            }
 
-            objCalData.IsSuccess = true;
-            objCalData.Msg = "update success";
-            objCalData.error = null;
+                objCalData.IsSuccess = true;
+                objCalData.Msg = "update success";
+                objCalData.error = null;
+            }
+            catch (Exception ex)
+            {
+                objCalData.IsSuccess = false;
+                objCalData.Msg = "update failed";
+                objCalData.Data = "";
+                objCalData.error = ex.Message;
+            }
         }
-        catch (Exception ex)
+        else
         {
             objCalData.IsSuccess = false;
-            objCalData.Msg = "update failed";
+            objCalData.Msg = "Please register the client first";
             objCalData.Data = "";
-            objCalData.error = ex.Message;
+            objCalData.error = "Client is not registered";
         }
+
+        
 
         return objCalData;
     }
@@ -458,45 +470,58 @@ public class CalService
         CalendarData objCalData = new CalendarData();
         objCalData.events = new List<ArrayList>();
 
-        try
+        if (Convert.ToInt64(customerID) != 0)
         {
-            using (SqlConnection conn = new SqlConnection(connDietDB))
+            try
             {
-                using (SqlCommand cmd = new SqlCommand())
+                using (SqlConnection conn = new SqlConnection(connDietDB))
                 {
-                    if (conn.State == ConnectionState.Closed) conn.Open();
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        if (conn.State == ConnectionState.Closed) conn.Open();
 
-                    cmd.Connection = conn;
-                    cmd.CommandText = "insert into dbo.jqcalendar(Subject,StartTime,EndTime,IsAllDayEvent,Location,Description,Color,CustID,SessionCode) output INSERTED.Id values(@Subject,@StartTime,@EndTime,@IsAllDayEvent,@Location,@Description,@Color,@CustID,@SessionCode)";
-                    cmd.Parameters.Add("@Subject", SqlDbType.NVarChar).Value = sub;
-                    cmd.Parameters.Add("@StartTime", SqlDbType.DateTime).Value = (st != null) ? Convert.ToDateTime(st) : DateTime.UtcNow.AddHours(5.5);
-                    cmd.Parameters.Add("@EndTime", SqlDbType.DateTime).Value = (et != null) ? Convert.ToDateTime(et) : DateTime.UtcNow.AddHours(5.5);
-                    cmd.Parameters.Add("@IsAllDayEvent", SqlDbType.SmallInt).Value = Convert.ToInt16(ade);
+                        cmd.Connection = conn;
+                        cmd.CommandText = "insert into dbo.jqcalendar(Subject,StartTime,EndTime,IsAllDayEvent,Location,Description,Color,CustID,SessionCode) output INSERTED.Id values(@Subject,@StartTime,@EndTime,@IsAllDayEvent,@Location,@Description,@Color,@CustID,@SessionCode)";
+                        cmd.Parameters.Add("@Subject", SqlDbType.NVarChar).Value = sub;
+                        cmd.Parameters.Add("@StartTime", SqlDbType.DateTime).Value = (st != null) ? Convert.ToDateTime(st) : DateTime.UtcNow.AddHours(5.5);
+                        cmd.Parameters.Add("@EndTime", SqlDbType.DateTime).Value = (et != null) ? Convert.ToDateTime(et) : DateTime.UtcNow.AddHours(5.5);
+                        cmd.Parameters.Add("@IsAllDayEvent", SqlDbType.SmallInt).Value = Convert.ToInt16(ade);
 
-                    cmd.Parameters.Add("@Location", SqlDbType.NVarChar).Value = loc;
-                    cmd.Parameters.Add("@Description", SqlDbType.NVarChar).Value = dscr;
-                    cmd.Parameters.Add("@Color", SqlDbType.SmallInt).Value = Convert.ToInt16(color);
-                    cmd.Parameters.Add("@SessionCode", SqlDbType.NVarChar).Value = Convert.ToString(HttpContext.Current.Session["UserCode"]);
-                    cmd.Parameters.Add("@CustID", SqlDbType.BigInt).Value = Convert.ToInt64(customerID);
+                        cmd.Parameters.Add("@Location", SqlDbType.NVarChar).Value = loc;
+                        cmd.Parameters.Add("@Description", SqlDbType.NVarChar).Value = dscr;
+                        cmd.Parameters.Add("@Color", SqlDbType.SmallInt).Value = Convert.ToInt16(color);
+                        cmd.Parameters.Add("@SessionCode", SqlDbType.NVarChar).Value = Convert.ToString(HttpContext.Current.Session["UserCode"]);
+                        cmd.Parameters.Add("@CustID", SqlDbType.BigInt).Value = Convert.ToInt64(customerID);
 
 
-                    objCalData.Data = cmd.ExecuteScalar().ToString();
+                        objCalData.Data = cmd.ExecuteScalar().ToString();
 
-                    if (conn.State == ConnectionState.Open) conn.Close();
+                        if (conn.State == ConnectionState.Open) conn.Close();
+                    }
                 }
+
+                objCalData.IsSuccess = true;
+                objCalData.Msg = "add success";
+                objCalData.error = null;
+            }
+            catch (Exception ex)
+            {
+                objCalData.IsSuccess = false;
+                objCalData.Msg = "add failed";
+                objCalData.Data = "";
+                objCalData.error = ex.Message;
             }
 
-            objCalData.IsSuccess = true;
-            objCalData.Msg = "add success";
-            objCalData.error = null;
         }
-        catch (Exception ex)
+        else
         {
             objCalData.IsSuccess = false;
-            objCalData.Msg = "add failed";
+            objCalData.Msg = "Please register the client first";
             objCalData.Data = "";
-            objCalData.error = ex.Message;
+            objCalData.error = "Client is not registered";
         }
+
+        
 
         return objCalData;
     }

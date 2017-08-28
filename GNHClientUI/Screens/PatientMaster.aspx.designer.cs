@@ -1938,15 +1938,6 @@ public partial class Screens_PatientMaster {
     protected global::System.Web.UI.WebControls.TextBox txtSleep;
     
     /// <summary>
-    /// RegularExpressionValidator42 control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator42;
-    
-    /// <summary>
     /// txtBMR control.
     /// </summary>
     /// <remarks>
