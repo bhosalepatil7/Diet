@@ -319,13 +319,13 @@ namespace GNHClientUI {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator6;
         
         /// <summary>
-        /// RegularExpressionValidator7 control.
+        /// custMobileNumber control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator7;
+        protected global::System.Web.UI.WebControls.CustomValidator custMobileNumber;
         
         /// <summary>
         /// txtLandline control.
@@ -337,13 +337,13 @@ namespace GNHClientUI {
         protected global::System.Web.UI.WebControls.TextBox txtLandline;
         
         /// <summary>
-        /// RegularExpressionValidator62 control.
+        /// custLandlineNumber control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator62;
+        protected global::System.Web.UI.WebControls.CustomValidator custLandlineNumber;
         
         /// <summary>
         /// ddlProfession control.
@@ -1946,15 +1946,6 @@ namespace GNHClientUI {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtSleep;
-        
-        /// <summary>
-        /// RegularExpressionValidator42 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator42;
         
         /// <summary>
         /// txtBMR control.

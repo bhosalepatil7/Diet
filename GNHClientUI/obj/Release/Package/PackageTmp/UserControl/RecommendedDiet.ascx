@@ -501,7 +501,7 @@
 <script src="../assets/js/ace/elements.typeahead.js"></script>
 <script src="../Scripts/notify.min.js"></script>
 <!-- inline scripts related to this page -->
-<script src="../Scripts/RecommendedDiet.js?v=2017082703"></script>
+<script src="../Scripts/RecommendedDiet.js?v=2017082803"></script>
 <script>
     $(document).ready(function () {
         setDietRecommendedType();

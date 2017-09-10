@@ -5,9 +5,10 @@
 <%@ Register TagPrefix="UC" TagName="Recall" Src="~/UserControl/RecallDiet.ascx" %>
 <%@ Register TagPrefix="UC" TagName="Recommend" Src="~/UserControl/RecommendedDiet.ascx" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder3" runat="Server">
-    <%--<script src="http://code.jquery.com/jquery-1.12.3.min.js"></script>--%>
+    <link href="../css/intlTelInput.css" rel="stylesheet" />
+
     <script src="../assets/js/jquery.js"></script>
-    <%--<script src="../Scripts/jquery-1.12.0.js"></script>--%>
+    <script src="../Scripts/phone-format.js?v=2017082606"></script>
     <script src="../assets/js/jquery-ui.custom.js"></script>
     <script src="../assets/js/jquery.ui.touch-punch.js"></script>
     <script src="../assets/js/chosen.jquery.js"></script>
@@ -18,10 +19,8 @@
     <script src="../assets/js/jquery.maskedinput.js"></script>
     <script src="../assets/js/jquery.addnew.js"></script>
     <script src="../Scripts/gnh-converter.js"></script>
-    <script src="../Scripts/RecallDiet.js"></script>
-    <script src="../Scripts/RecommendedDiet.js"></script>
-    <%--    <script src="../Scripts/js/jquery.dateselect.js"></script>
-    <link href="../Scripts/css/jquery.dateselect.css" rel="stylesheet" type="text/css" />--%>
+    <script src="../Scripts/RecallDiet.js?v=2017082805"></script>
+    <script src="../Scripts/RecommendedDiet.js?v=2017082805"></script>
     <style type="text/css">
         .table {
             border-bottom: 0px !important;
@@ -316,26 +315,26 @@
         $(document).ready(function () {
             //$("#tabs").tabs();
 
-            //$("a[href$='tabs-7']").parent().replaceWith("</ul><ul>"); //hide RecallDiet Tab
+            /*$("a[href$='tabs-7']").parent().replaceWith("</ul><ul>"); //hide RecallDiet Tab
 
-            $("body").keydown(function (event) {
-                switch (event.which) {
-                    case 37: //Arrow left
-                        $('.nav-tabs > .active').prev('li').find('a').trigger('click');
-                        break;
-                    case 39: //Arrow left
-                        $('.nav-tabs > .active').next('li').find('a').trigger('click');
-                        break;
-                }
-            });
-
+			//$("body").keydown(function (event) {
+			//    switch (event.which) {
+			//        case 37: //Arrow left
+			//            $('.nav-tabs > .active').prev('li').find('a').trigger('click');
+			//            break;
+			//        case 39: //Arrow left
+			//            $('.nav-tabs > .active').next('li').find('a').trigger('click');
+			//            break;
+			//    }
+			//});
+			*/
             $(document).keydown(function (e) {
 
                 // Set self as the current item in focus
                 var self = $(':focus'),
-                    // Set the form by the current item in focus
-                    form = self.parents('form:eq(0)'),
-                    focusable;
+					// Set the form by the current item in focus
+					form = self.parents('form:eq(0)'),
+					focusable;
 
                 // Array of Indexable/Tab-able items
                 focusable = form.find('input,a,select,button,textarea').filter(':visible');
@@ -375,8 +374,53 @@
             //$('#btnComorbidity').live('click', function (evt) { SetTabs(); });
         });
 
+
+        function ValidateMobileOnSubmit(oSrc, args) {
+            debugger;
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            args.IsValid = isValidNumberForRegion(txtMobile.val(), aCountryCode);
+        }
+
+        function ValidateLandlineOnSubmit(oSrc, args) {
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+            args.IsValid = isValidNumberForRegion(txtLandline.val(), aCountryCode);
+        }
+
+        function SetExampleMobileLandlineNumber() {
+            var selectedCountry = $("#ContentPlaceHolder1_ContentPlaceHolder3_ddlCountries option:selected");
+            var aCountryCode = countryNameToCode("" + selectedCountry.text());
+            var txtMobile = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtMobile");
+            var txtLandline = $("#ContentPlaceHolder1_ContentPlaceHolder3_txtLandline");
+
+            txtMobile.attr('placeholder', exampleMobileNumber(aCountryCode));
+            txtLandline.attr('placeholder', exampleLandlineNumber(aCountryCode));
+        }
+
+        function pageLoad(sender, args) {
+            $(document).ready(function () {
+                SetExampleMobileLandlineNumber();
+            });
+        }
+
+
         function SetTabs() {
 
+            $("textarea").on("keydown", function (e) {
+                var key = e.keyCode;
+                debugger;
+                // If the user has pressed enter
+                if (key === 13) {
+                    $(this)[0].value = '' + $(this)[0].value + '\n';
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
             //Calling BMR Function first time
             BMR();
             if ($("[id='ContentPlaceHolder1_ContentPlaceHolder3_TabName']").val() == "") {
@@ -477,6 +521,17 @@
                         minuteStep: 1,
                         showSeconds: false,
                         showMeridian: false
+                    }).on("changeTime.timepicker", function (e) {
+                        debugger;
+                        var MealId = $(this).data().mealName;
+                        var prevMealTime = $(this).attr('data-meal-time');
+                        var newMealTime = e.time.value;
+                        //console.log('' + MealId + ' New Meal Time - ' + newMealTime + ' Old Meal Time - ' + prevMealTime);
+                        if (prevMealTime != newMealTime) {
+                            changeRecommendedMealTime(MealId);
+                            $(this).attr('data-meal-time', newMealTime);
+                            $(this).attr('value', newMealTime);
+                        }
                     }).next().on(ace.click_event, function () {
                         $(this).prev().focus();
                     });
@@ -558,12 +613,25 @@
                     });
 
                     $("#RecallDietSection input[id*='txtTimePickerMeal']").timepicker({
+                        //onSelect: function (d,i) { console.log('Hi'+i.lastVal());},
                         minuteStep: 1,
                         showSeconds: false,
                         showMeridian: false
+                    }).on("changeTime.timepicker", function (e) {
+                        debugger;
+                        var MealId = $(this).data().mealName;
+                        var prevMealTime = $(this).attr('data-meal-time');
+                        var newMealTime = e.time.value;
+                        //console.log('' + MealId + ' New Meal Time - ' + newMealTime + ' Old Meal Time - ' + prevMealTime);
+                        if (prevMealTime != newMealTime) {
+                            changeRecallMealTime(MealId);
+                            $(this).attr('data-meal-time', newMealTime);
+                            $(this).attr('value', newMealTime);
+                        }
                     }).next().on(ace.click_event, function () {
                         $(this).prev().focus();
                     });
+
 
                     ////////
                 }
@@ -590,23 +658,23 @@
             $('#tabs a[href="#' + tabName + '"]').trigger('click');
 
 
-            <%--//Datepicker
-            $('.btn-date').on('click', function (e) {
-                e.preventDefault();
-                $.dateSelect.show({
-                    element: $('#<%= txtDOB.ClientID %>')
-                });
-            });--%>
+			<%--//Datepicker
+			$('.btn-date').on('click', function (e) {
+				e.preventDefault();
+				$.dateSelect.show({
+					element: $('#<%= txtDOB.ClientID %>')
+				});
+			});--%>
 
             $('#<%= txtDOB.ClientID %>').datepicker({
                 autoclose: true,
                 format: 'dd/mm/yyyy'
             }).mask('99/99/9999');
-
             $('#<%= AppDate.ClientID %>').datepicker({
                 autoclose: true,
                 format: 'dd/mm/yyyy'
             }).mask('99/99/9999');
+
             var age = document.getElementById('<%=txtAge.ClientID %>').value;
             if (age < 18)
                 $('div .child').css('display', 'block');
@@ -662,7 +730,7 @@
 
             $('#<%= txtBloodPressure.ClientID %>').mask('999/999');
 
-            $('#<%= txtSleep.ClientID %>').mask('99/99');
+            //$('#<%= txtSleep.ClientID %>').mask('99/99')
 
             $('#<%= ddlAlcohol.ClientID %>').change(function () {
                 if ($(this).val() == 'Yes') {
@@ -718,6 +786,7 @@
                 $('div .NoExercise').css('display', 'none');
             }
 
+
             $('#<%= ddlExercise.ClientID %>').change(function () {
                 if ($(this).val() == 'Yes') {
                     $('div .NoExercise').css('display', 'block');
@@ -726,6 +795,54 @@
                     $('div .NoExercise').css('display', 'none');
                 }
             });
+
+            $('#<%= ddlVitaminSuplement.ClientID %>').change(function () {
+                if ($(this).val() == 'Yes') {
+                    $('div .vitamindiv').css('opacity', '1');
+                }
+                else {
+                    $('div .vitamindiv').css('opacity', '0');
+                }
+            });
+
+            if ($('#<%= ddlVitaminSuplement.ClientID %>').val() == 'Yes') {
+                $('div .vitamindiv').css('opacity', '1');
+            }
+            else {
+                $('div .vitamindiv').css('opacity', '0');
+            }
+
+            $('#<%= ddlMineralSuppliment.ClientID %>').change(function () {
+                if ($(this).val() == 'Yes') {
+                    $('div .mineraldiv').css('opacity', '1');
+                }
+                else {
+                    $('div .mineraldiv').css('opacity', '0');
+                }
+            });
+
+            if ($('#<%= ddlMineralSuppliment.ClientID %>').val() == 'Yes') {
+                $('div .mineraldiv').css('opacity', '1');
+            }
+            else {
+                $('div .mineraldiv').css('opacity', '0');
+            }
+
+            $('#<%= ddlOralDetails.ClientID %>').change(function () {
+                if ($(this).val() == 'Yes') {
+                    $('div .oraldiv').css('opacity', '1');
+                }
+                else {
+                    $('div .oraldiv').css('opacity', '0');
+                }
+            });
+
+            if ($('#<%= ddlOralDetails.ClientID %>').val() == 'Yes') {
+                $('div .oraldiv').css('opacity', '1');
+            }
+            else {
+                $('div .oraldiv').css('opacity', '0');
+            }
 
             $('#<%= ddlDietType.ClientID %>').change(function () {
                 if ($(this).val().toUpperCase() == 'NON-VEGETARIAN') {
@@ -772,54 +889,6 @@
             $("#<%=ddlActivity.ClientID%>").change(function () {
                 BMR();
             });
-
-            $('#<%= ddlVitaminSuplement.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('#<%=txtVitaminSuplement.ClientID%>').css('display', 'block');
-                }
-                else {
-                    $('#<%=txtVitaminSuplement.ClientID%>').css('display', 'none');
-                }
-            });
-
-            if ($('#<%= ddlVitaminSuplement.ClientID %>').val() == 'Yes') {
-                $('#<%=txtVitaminSuplement.ClientID%>').css('display', 'block');
-            }
-            else {
-                $('#<%=txtVitaminSuplement.ClientID%>').css('display', 'none');
-            }
-
-            $('#<%= ddlMineralSuppliment.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('#<%=txtMineralSuplement.ClientID%>').css('display', 'block');
-                }
-                else {
-                    $('#<%=txtMineralSuplement.ClientID%>').css('display', 'none');
-                }
-            });
-
-            if ($('#<%= ddlMineralSuppliment.ClientID %>').val() == 'Yes') {
-                $('#<%=txtMineralSuplement.ClientID%>').css('display', 'block');
-            }
-            else {
-                $('#<%=txtMineralSuplement.ClientID%>').css('display', 'none');
-            }
-
-            $('#<%= ddlOralDetails.ClientID %>').change(function () {
-                if ($(this).val() == 'Yes') {
-                    $('#<%=txtOralDrugDetails.ClientID%>').css('display', 'block');
-                }
-                else {
-                    $('#<%=txtOralDrugDetails.ClientID%>').css('display', 'none');
-                }
-            });
-
-            if ($('#<%= ddlOralDetails.ClientID %>').val() == 'Yes') {
-                $('#<%=txtOralDrugDetails.ClientID%>').css('display', 'block');
-            }
-            else {
-                $('#<%=txtOralDrugDetails.ClientID%>').css('display', 'none');
-            }
 
         };
         function Nonveg() {
@@ -895,7 +964,7 @@
                 weight = ConvertToKgs(weight, WeightBaseUnit);
 
                 var BMI = (weight / (Height * Height)).toFixed(2); //Roundoff to two decimals
-             <%--   document.getElementById('<%=txtBMI.ClientID %>').disabled = false;--%>
+			 <%--   document.getElementById('<%=txtBMI.ClientID %>').disabled = false;--%>
                 document.getElementById('<%=txtBMI.ClientID %>').value = BMI;
 <%--                document.getElementById('<%=txtBMI.ClientID %>').disabled = true;--%>
                 if (BMI <= 15) {
@@ -915,13 +984,13 @@
                 }
                 else if (BMI > 30 && BMI <= 35) {
                     document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class I (Moderately obese)";
-                }
-                else if (BMI > 35 && BMI <= 40) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class II (Severely obese)";
-                }
-                else if (BMI > 40) {
-                    document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class III (Very severely obese)";
-                }
+		        }
+		        else if (BMI > 35 && BMI <= 40) {
+		            document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class II (Severely obese)";
+		        }
+		        else if (BMI > 40) {
+		            document.getElementById('<%=txtBMICategory.ClientID %>').value = "Obese Class III (Very severely obese)";
+			    }
 
                 //IBW();
 }
@@ -1002,41 +1071,47 @@ function IBW() {
         }
         //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = false;
         var wt_Kg = ConvertToKgs(wt, 'LBS');
+
         document.getElementById('<%=txtIdealWeight.ClientID %>').value = wt_Kg.toFixed(2);
+        //if IBW is less than zero
+        if (wt_Kg < 0)
+            $("#lblIdlBdyWghtMsg").removeClass("hidden");
+        else
+            $("#lblIdlBdyWghtMsg").addClass("hidden");
         //document.getElementById('<%=txtIdealWeight.ClientID %>').disabled = true;
     }
 
 
 }
         /*
-         Body Frame calculation
-        
-         Women:
-        
-         Height under 5'2"
-         Small = wrist size less than 5.5"
-         Medium = wrist size 5.5" to 5.75"
-         Large = wrist size over 5.75"
-        
-         Height 5'2" to 5' 5"
-         Small = wrist size less than 6"
-         Medium = wrist size 6" to 6.25"
-         Large = wrist size over 6.25"
-        
-         Height over 5' 5"
-         Small = wrist size less than 6.25"
-         Medium = wrist size 6.25" to 6.5"
-         Large = wrist size over 6.5"
-        
-        
-         Men:
-        
-         Height over 5' 5"
-         Small = wrist size 5.5" to 6.5"
-         Medium = wrist size 6.5" to 7.5"
-         Large = wrist size over 7.5"
-        
-        */
+		 Body Frame calculation
+		
+		 Women:
+		
+		 Height under 5'2"
+		 Small = wrist size less than 5.5"
+		 Medium = wrist size 5.5" to 5.75"
+		 Large = wrist size over 5.75"
+		
+		 Height 5'2" to 5' 5"
+		 Small = wrist size less than 6"
+		 Medium = wrist size 6" to 6.25"
+		 Large = wrist size over 6.25"
+		
+		 Height over 5' 5"
+		 Small = wrist size less than 6.25"
+		 Medium = wrist size 6.25" to 6.5"
+		 Large = wrist size over 6.5"
+		
+		
+		 Men:
+		
+		 Height over 5' 5"
+		 Small = wrist size 5.5" to 6.5"
+		 Medium = wrist size 6.5" to 7.5"
+		 Large = wrist size over 7.5"
+		
+		*/
         function BodyFrame() {
 
             debugger;
@@ -1103,7 +1178,7 @@ function IBW() {
             }
             else if (document.getElementById('<%=ddlGender.ClientID %>').value == 'Male') {
                 // Height over 5' 5"
-                if (Height > 5.5) {
+                if (Height >= 5.5) {
                     // Small = wrist size 5.5" to 6.5"
                     if (Wrist >= 5.5 && Wrist < 6.5) {
                         bodyFrame = "small";
@@ -1151,13 +1226,14 @@ function IBW() {
         //        Men: BMR = 66 + ( 13.7 x weight in kilos ) + ( 5 x height in cm ) - ( 6.8 x age in years )
 
         /*
-                    1. If you are sedentary (little or no exercise) : Calorie-Calculation = BMR x 1.2
-                    2. If you are lightly active (light exercise/sports 1-3 days/week) : Calorie-Calculation = BMR x 1.375
-                    3. If you are moderatetely active (moderate exercise/sports 3-5 days/week) : Calorie-Calculation = BMR x 1.55
-                    4. If you are very active (hard exercise/sports 6-7 days a week) : Calorie-Calculation = BMR x 1.725
-                    5. If you are extra active (very hard exercise/sports & physical job or 2x training) : Calorie-Calculation = BMR x 1.9        
-        
-        */
+					1. If you are sedentary (little or no exercise) : Calorie-Calculation = BMR x 1.2
+					2. If you are lightly active (light exercise/sports 1-3 days/week) : Calorie-Calculation = BMR x 1.375
+					3. If you are moderatetely active (moderate exercise/sports 3-5 days/week) : Calorie-Calculation = BMR x 1.55
+					4. If you are very active (hard exercise/sports 6-7 days a week) : Calorie-Calculation = BMR x 1.725
+					5. If you are extra active (very hard exercise/sports & physical job or 2x training) : Calorie-Calculation = BMR x 1.9        
+		
+		*/
+
         function BMR() {
             debugger;
             var BMR = 0;
@@ -1213,24 +1289,24 @@ function IBW() {
             }
         }
     document.getElementById('<%=txtBMR.ClientID %>').value = BMR;
-            document.getElementById('<%=txtFatPer.ClientID %>').value = BMR;
+		    <%--if (document.getElementById('<%=txtFatPer.ClientID %>').value == '' || document.getElementById('<%=txtFatPer.ClientID %>').value == '0.00')
+		        document.getElementById('<%=txtFatPer.ClientID %>').value = BMR;--%>
             document.getElementById('<%=txtCalorie.ClientID %>').value = CALORIE;
             document.getElementById('<%=txtCalorie1.ClientID %>').value = CALORIE;
             if (document.getElementById('<%=txtCalorie2.ClientID %>').value == '')
                 document.getElementById('<%=txtCalorie2.ClientID %>').value = CALORIE;
         }
 
-
         //Calcualte calorie consumption
         /*
-        
-        Carbhohydrates	%  Of Calories	Kcal=	daily calories x percent protein / 4 calories per gram = grams protein
+		
+		Carbhohydrates	%  Of Calories	Kcal=	daily calories x percent protein / 4 calories per gram = grams protein
 			
-        Fat	%  Of Calories		=daily calories x percent fat / 9 calories per gram = grams fat
-    			
-        Protein 	%  Of Calories	=	daily calories x percent carbs / 4 calories per gram = grams carbs
+		Fat	%  Of Calories		=daily calories x percent fat / 9 calories per gram = grams fat
+				
+		Protein 	%  Of Calories	=	daily calories x percent carbs / 4 calories per gram = grams carbs
 
-        */
+		*/
         function CalorieCal() {
             var CALORIE = document.getElementById('<%=txtCalorie.ClientID %>').value;
             if (CALORIE != 0 && document.getElementById('<%=txtCarbhohydratesPercent.ClientID %>').value != "") {
@@ -1295,8 +1371,8 @@ function IBW() {
     </script>
     <style>
         /*#tabs {
-            font-size: 14px;
-        }*/
+			font-size: 14px;
+		}*/
 
         .ui-widget-header {
             bacKground: #b9cd6d;
@@ -1386,7 +1462,7 @@ function IBW() {
                         <li><a href="#tabs-5" data-toggle="tab">Diet And Lifestyle</a></li>
                         <li><a href="#tabs-7" data-toggle="tab">Recall Diet</a></li>
                         <li><a href="#tabs-8" data-toggle="tab">Recommended Diet</a></li>
-                        <%--<li><a href="#tabs-9" data-toggle="tab">Visits</a></li>--%>
+                        <li><a href="#tabs-9" data-toggle="tab">Visits</a></li>
                     </ul>
                     <div class="tab-content">
                         <div id="tabs-1" class="tab-pane fade in active">
@@ -1397,7 +1473,7 @@ function IBW() {
                                         <asp:TextBox ID="txtPatientID" CssClass="form-control" runat="server" TabIndex="1" Enabled="false" autocomplete="off" Visible="false"></asp:TextBox>
                                         <asp:TextBox ID="txtName" CssClass="form-control" runat="server" TabIndex="2" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator1" runat="server" ErrorMessage="Client Name Required" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator1" runat="server" ErrorMessage="Invalid Client Name" Display="Dynamic" ControlToValidate="txtName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1405,7 +1481,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtMiddleName" runat="server" TabIndex="3" autocomplete="off"></asp:TextBox>
                                         <%--                                    <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator2" runat="server" ErrorMessage="Client Middle Name Required" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator2" runat="server" ErrorMessage="Invalid Middle Name" Display="Dynamic" ControlToValidate="txtMiddleName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1413,7 +1489,7 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtLastName" runat="server" TabIndex="4" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator3" runat="server" ErrorMessage="Client LastName  Required" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,40}$"></asp:RegularExpressionValidator>
+                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator3" runat="server" ErrorMessage="Invalid txtLast Name" Display="Dynamic" ControlToValidate="txtLastName" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z ]{1,40}$"></asp:RegularExpressionValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1421,14 +1497,14 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control cur" ID="txtDOB" runat="server" TabIndex="5" autocomplete="off" PlaceHolder="dd/MM/yyyy" Style="cursor: auto !important" onchange="CalculateAge();BMR();"></asp:TextBox>
                                         <%--<span style="position: absolute">
-                                            <asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
-                                            <asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
-                                                TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
-                                            </asp:CalendarExtender>
-                                        </span>--%>
+											<asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
+											<asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
+												TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
+											</asp:CalendarExtender>
+										</span>--%>
                                         <%--<span class="input-group-btn">
-                                            <button class="btn btn-primary btn-date" type="button"><i class="fa fa-calendar"></i></button>
-                                        </span>--%>
+											<button class="btn btn-primary btn-date" type="button"><i class="fa fa-calendar"></i></button>
+										</span>--%>
                                         <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator4" runat="server" ErrorMessage="DOB Required" Display="Dynamic" ControlToValidate="txtDOB" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
                                     </div>
                                 </div>
@@ -1522,18 +1598,28 @@ function IBW() {
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-3 control-label text-right">Mobile</label><label class="col-sm-1 control-label text-right" style="color: red">*</label>
-                                    <div class="col-sm-8 control-block">
-                                        <asp:TextBox CssClass="form-control" ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
+                                    <div class="col-sm-8  control-block">
+                                        <%--<div class="input-group">--%>
+                                        <%--<div class="input-group-addon">
+												<asp:Label runat="server" ID="lblMob1"></asp:Label>
+											</div>--%>
+                                        <%--<asp:TextBox CssClass="form-control" ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
+											<asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
+											<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
+                                        <asp:TextBox ID="txtMobile" runat="server" TabIndex="14" autocomplete="off"></asp:TextBox>
                                         <asp:RequiredFieldValidator runat="server" CssClass="err-block err-bottom" ID="RequiredFieldValidator6" ErrorMessage="Select Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator7" runat="server" ErrorMessage="Invalid Mobile " Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$"></asp:RegularExpressionValidator>
+                                        <asp:CustomValidator ID="custMobileNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Mobile" Display="Dynamic" ControlToValidate="txtMobile" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateMobileOnSubmit" OnServerValidate="MobileNumberValidate"></asp:CustomValidator>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-4 control-label text-right">Landline</label>
-                                    <div class="col-sm-8 control-block">
+                                    <div class="col-sm-8  control-block">
+                                        <%--<asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
+											<%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
+											<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red"></asp:RegularExpressionValidator>--%>
                                         <asp:TextBox CssClass="form-control" ID="txtLandline" runat="server" TabIndex="15" autocomplete="off"></asp:TextBox>
-                                        <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator9" runat="server" ErrorMessage="Contact Required" Display="Dynamic" ControlToValidate="txtContact" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator62" runat="server" ErrorMessage="Invalid Landline " Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^\d+$"></asp:RegularExpressionValidator>
+                                        <asp:CustomValidator ID="custLandlineNumber" runat="server" CssClass="err-block err-bottom" ErrorMessage="Invalid Landline" Display="Dynamic" ControlToValidate="txtLandline" ValidationGroup="ValidationGroup" ForeColor="Red" ClientValidationFunction="ValidateLandlineOnSubmit" OnServerValidate="LandlineNumberValidate"></asp:CustomValidator>
+                                        <%--</div>--%>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-4">
@@ -1556,21 +1642,21 @@ function IBW() {
                                     </div>
                                 </div>
                                 <%-- <div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Present Exercise</label>
-                                    <div class="col-sm-8 control-block">
-                                        <asp:TextBox CssClass="form-control" ID="txtExercise1" runat="server" TabIndex="17" autocomplete="off"></asp:TextBox>
-                                        <%-- <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator10" runat="server" ErrorMessage="Present Exercise Required" Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator8" runat="server" ErrorMessage="Invalid Present Exercise " Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z0-9''-'\s]{1,100}$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
+									<label class="col-sm-4 control-label text-right">Present Exercise</label>
+									<div class="col-sm-8 control-block">
+										<asp:TextBox CssClass="form-control" ID="txtExercise1" runat="server" TabIndex="17" autocomplete="off"></asp:TextBox>
+										<%-- <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator10" runat="server" ErrorMessage="Present Exercise Required" Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator8" runat="server" ErrorMessage="Invalid Present Exercise " Display="Dynamic" ControlToValidate="txtExercise1" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z0-9''-'\s]{1,100}$"></asp:RegularExpressionValidator>
+									</div>
+								</div>--%>
                                 <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Execise Activity</label>
-                                    <div class="col-sm-8 control-block">
-                                        <asp:TextBox CssClass="form-control" ID="txtExercise2" runat="server" TabIndex="18" autocomplete="off"></asp:TextBox>
-                                        <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator11" runat="server" ErrorMessage="Exercise Activity Required" Display="Dynamic" ControlToValidate="txtExercise2" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
+									<label class="col-sm-4 control-label text-right">Execise Activity</label>
+									<div class="col-sm-8 control-block">
+										<asp:TextBox CssClass="form-control" ID="txtExercise2" runat="server" TabIndex="18" autocomplete="off"></asp:TextBox>
+										<%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator11" runat="server" ErrorMessage="Exercise Activity Required" Display="Dynamic" ControlToValidate="txtExercise2" ValidationGroup="ValidationGroup" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
                                 <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator9" runat="server" ErrorMessage="Invalid Exercise Activity " Display="Dynamic" ControlToValidate="txtExercise2" ValidationGroup="ValidationGroup" ForeColor="Red" ValidationExpression="^[a-zA-Z''-'\s]{1,100}$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
+									</div>
+								</div>--%>
 
                                 <div class="form-group col-sm-6 col-md-12">
                                     <label class="col-sm-1 control-label text-right">Notes</label>
@@ -1617,24 +1703,24 @@ function IBW() {
                                 </div>
 
                                 <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Wt. Loss Month</label>
+									<label class="col-sm-4 control-label text-right">Wt. Loss Month</label>
 
-                                    <div class="col-sm-8  control-block">
-                                        <div class="input-group">
-                                            <asp:TextBox CssClass="form-control" ID="txtWeightLossMonth" runat="server" TabIndex="22" autocomplete="off"></asp:TextBox>
-                                            <div class="input-group-addon">
-                                                <asp:DropDownList CssClass="form-control" ID="ddlWeightUnit1" runat="server" TabIndex="23">
-                                                    <asp:ListItem>Kg</asp:ListItem>
-                                                    <asp:ListItem>Gram</asp:ListItem>
-                                                    <asp:ListItem>Lbs</asp:ListItem>
-                                                </asp:DropDownList>
-                                            </div>
-                                        </div>
+									<div class="col-sm-8  control-block">
+										<div class="input-group">
+											<asp:TextBox CssClass="form-control" ID="txtWeightLossMonth" runat="server" TabIndex="22" autocomplete="off"></asp:TextBox>
+											<div class="input-group-addon">
+												<asp:DropDownList CssClass="form-control" ID="ddlWeightUnit1" runat="server" TabIndex="23">
+													<asp:ListItem>Kg</asp:ListItem>
+													<asp:ListItem>Gram</asp:ListItem>
+													<asp:ListItem>Lbs</asp:ListItem>
+												</asp:DropDownList>
+											</div>
+										</div>
 
-                                        <asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator14" runat="server" ErrorMessage="Weight Loss Month Required" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator12" runat="server" ErrorMessage="Invalid Weight Loss Month" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
+										<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator14" runat="server" ErrorMessage="Weight Loss Month Required" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator12" runat="server" ErrorMessage="Invalid Weight Loss Month" Display="Dynamic" ControlToValidate="txtWeightLossMonth" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
+									</div>
+								</div>--%>
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-3 control-label text-right">Measured Ht</label><label class="col-sm-1 control-label text-right" style="color: red">*</label>
                                     <div class="col-sm-8  control-block">
@@ -1654,47 +1740,47 @@ function IBW() {
                                     </div>
                                 </div>
                                 <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Wt Loss Six Month</label>
-                                    <div class="col-sm-8  control-block">
-                                        <div class="input-group">
-                                            <asp:TextBox CssClass="form-control" ID="txtWeightLossSixMonths" runat="server" TabIndex="7" autocomplete="off"></asp:TextBox>
-                                            <div class="input-group-addon">
-                                                <asp:DropDownList CssClass="form-control" ID="ddlWeightUnit2" runat="server" TabIndex="8">
-                                                    <asp:ListItem>Kg</asp:ListItem>
-                                                    <asp:ListItem>Gram</asp:ListItem>
-                                                    <asp:ListItem>Lbs</asp:ListItem>
-                                                </asp:DropDownList>
-                                            </div>
-                                        </div>
-                                       
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator14" runat="server" ErrorMessage="Invalid WeightLossSixMonths" Display="Dynamic" ControlToValidate="txtWeightLossSixMonths" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
-                                    </div>
-                                </div>--%>
+									<label class="col-sm-4 control-label text-right">Wt Loss Six Month</label>
+									<div class="col-sm-8  control-block">
+										<div class="input-group">
+											<asp:TextBox CssClass="form-control" ID="txtWeightLossSixMonths" runat="server" TabIndex="7" autocomplete="off"></asp:TextBox>
+											<div class="input-group-addon">
+												<asp:DropDownList CssClass="form-control" ID="ddlWeightUnit2" runat="server" TabIndex="8">
+													<asp:ListItem>Kg</asp:ListItem>
+													<asp:ListItem>Gram</asp:ListItem>
+													<asp:ListItem>Lbs</asp:ListItem>
+												</asp:DropDownList>
+											</div>
+										</div>
+									   
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator14" runat="server" ErrorMessage="Invalid WeightLossSixMonths" Display="Dynamic" ControlToValidate="txtWeightLossSixMonths" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
+									</div>
+								</div>--%>
 
                                 <%--<div class="form-group col-sm-6 col-md-4">
-                                    <label class="col-sm-4 control-label text-right">Wt Loss Year</label>
-                                    <div class="col-sm-8  control-block">
-                                        <div class="input-group">
-                                            <asp:TextBox CssClass="form-control" ID="txtWeightLossYear" runat="server" TabIndex="11" autocomplete="off"></asp:TextBox>
-                                            <div class="input-group-addon">
-                                                <asp:DropDownList CssClass="form-control" ID="ddlWeightUnit4" runat="server" TabIndex="12">
-                                                    <asp:ListItem>Kg</asp:ListItem>
-                                                    <asp:ListItem>Gram</asp:ListItem>
-                                                    <asp:ListItem>Lbs</asp:ListItem>
-                                                </asp:DropDownList>
-                                            </div>
-                                        </div>
-                                        
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator16" runat="server" ErrorMessage="Invalid WeightLossYear" Display="Dynamic" ControlToValidate="txtWeightLossYear" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
+									<label class="col-sm-4 control-label text-right">Wt Loss Year</label>
+									<div class="col-sm-8  control-block">
+										<div class="input-group">
+											<asp:TextBox CssClass="form-control" ID="txtWeightLossYear" runat="server" TabIndex="11" autocomplete="off"></asp:TextBox>
+											<div class="input-group-addon">
+												<asp:DropDownList CssClass="form-control" ID="ddlWeightUnit4" runat="server" TabIndex="12">
+													<asp:ListItem>Kg</asp:ListItem>
+													<asp:ListItem>Gram</asp:ListItem>
+													<asp:ListItem>Lbs</asp:ListItem>
+												</asp:DropDownList>
+											</div>
+										</div>
+										
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator16" runat="server" ErrorMessage="Invalid WeightLossYear" Display="Dynamic" ControlToValidate="txtWeightLossYear" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>
 
-                                    </div>
-                                </div>--%>
+									</div>
+								</div>--%>
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-4 control-label text-right">Calculated BMI</label>
                                     <div class="col-sm-8  control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtBMI" runat="server" autocomplete="off"></asp:TextBox>
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator19" runat="server" ErrorMessage="BMI Required" Display="Dynamic" ControlToValidate="txtBMI" ValidationGroup="validationGroup1" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator17" runat="server" ErrorMessage="Invalid BMI" Display="Dynamic" ControlToValidate="txtBMI" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>--%>
+										<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator17" runat="server" ErrorMessage="Invalid BMI" Display="Dynamic" ControlToValidate="txtBMI" ValidationGroup="validationGroup1" ForeColor="Red" ValidationExpression="^\d+(\.\d{1,2})?$"></asp:RegularExpressionValidator>--%>
                                     </div>
                                 </div>
 
@@ -1713,14 +1799,14 @@ function IBW() {
                                     <div class="col-sm-8  control-block">
                                         <asp:TextBox CssClass="form-control" runat="server" ID="txtBMICategory"></asp:TextBox>
                                         <%-- <asp:DropDownList CssClass="form-control" ID="ddlBMI" runat="server" Enabled="false">
-                                            <asp:ListItem>--Select BMI--</asp:ListItem>
-                                            <asp:ListItem>Underweight BMI < 18.5</asp:ListItem>
-                                            <asp:ListItem>Normal BMI 18.5 - 22.9</asp:ListItem>
-                                            <asp:ListItem>Overweight 23 - 24.9 </asp:ListItem>
-                                            <asp:ListItem>Obese Class I 25 - 32.9</asp:ListItem>
-                                            <asp:ListItem>Obese Class II 33 - 39.9</asp:ListItem>
-                                            <asp:ListItem>Obese Class III > 40</asp:ListItem>
-                                        </asp:DropDownList>--%>
+											<asp:ListItem>--Select BMI--</asp:ListItem>
+											<asp:ListItem>Underweight BMI < 18.5</asp:ListItem>
+											<asp:ListItem>Normal BMI 18.5 - 22.9</asp:ListItem>
+											<asp:ListItem>Overweight 23 - 24.9 </asp:ListItem>
+											<asp:ListItem>Obese Class I 25 - 32.9</asp:ListItem>
+											<asp:ListItem>Obese Class II 33 - 39.9</asp:ListItem>
+											<asp:ListItem>Obese Class III > 40</asp:ListItem>
+										</asp:DropDownList>--%>
                                     </div>
                                 </div>
 
@@ -1838,6 +1924,7 @@ function IBW() {
                                     <div class="col-sm-8  control-block">
                                         <div class="input-group">
                                             <asp:TextBox CssClass="form-control" ID="txtIdealWeight" runat="server" autocomplete="off"></asp:TextBox>
+                                            <span class="hidden" style="color: red; display: inline; top: 35px; bottom: 0; left: 0; right: 0; position: absolute;" id="lblIdlBdyWghtMsg">Please check Height/Weight Values</span>
                                             <div class="input-group-addon">
                                                 <asp:Label ID="Label8" Text="KG" runat="server"></asp:Label>
                                             </div>
@@ -1990,11 +2077,11 @@ function IBW() {
                                     <div class="col-sm-8 control-block">
                                         <asp:TextBox CssClass="form-control cur" ID="txtTestDate" runat="server" TabIndex="1" autocomplete="off" PlaceHolder="dd/MM/yyyy" Style="cursor: auto !important"></asp:TextBox>
                                         <%--<span style="position: absolute">
-                                            <asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
-                                            <asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
-                                                TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
-                                            </asp:CalendarExtender>
-                                        </span>--%>
+											<asp:ImageButton ID="lnkFromDate" runat="server" ImageUrl="~/Master/Images/calendar.gif" />
+											<asp:CalendarExtender ID="FromDate_CalendarExtender" runat="server" Enabled="True"
+												TargetControlID="txtDOB" PopupButtonID="lnkFromDate" Format="dd/MM/yyyy">
+											</asp:CalendarExtender>
+										</span>--%>
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator2" runat="server" ErrorMessage="Test Date Required" Display="Dynamic" ControlToValidate="txtTestDate" ValidationGroup="validationGroup2" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
                                     </div>
                                 </div>
@@ -2454,7 +2541,7 @@ function IBW() {
                                 <div class="form-group col-sm-6 col-md-12 padd">
                                     <div class="col-sm-5 control-block align-center"></div>
                                     <div class="col-sm-2 control-block align-center">
-                                        <asp:Button runat="server" ID="btnComorbidity" Text="Save" CssClass="btn btn-primary btn-lg btn-block display" CausesValidation="false" OnClick="btnComorbidity_Click" Visible="false" />
+                                        <asp:Button runat="server" ID="btnComorbidity" Text="Save" CssClass="btn btn-primary btn-lg btn-block" CausesValidation="false" OnClick="btnComorbidity_Click" />
                                     </div>
                                 </div>
                             </div>
@@ -2555,7 +2642,7 @@ function IBW() {
 
                                 <legend class="col-sm-12">Medication</legend>
 
-                                <div class="form-group col-sm-6 col-md-4">
+                                <div class="form-group col-sm-6 col-md-5">
                                     <label class="col-sm-4 control-label text-right">Vitamin Suplement</label>
                                     <div class="col-sm-8  control-block">
                                         <asp:HiddenField ID="hdnMCID" runat="server" />
@@ -2566,7 +2653,7 @@ function IBW() {
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-6 col-md-4">
+                                <div class="form-group col-sm-6 col-md-7 vitamindiv">
                                     <label class="col-sm-4 control-label text-right">Vitamin Suplement Details</label>
                                     <div class="col-sm-8  control-block">
                                         <asp:TextBox CssClass="form-control" runat="server" ID="txtVitaminSuplement" TabIndex="18" autocomplete="off"></asp:TextBox>
@@ -2575,7 +2662,7 @@ function IBW() {
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-6 col-md-4">
+                                <div class="form-group col-sm-6 col-md-5">
                                     <label class="col-sm-4 control-label text-right">Mineral Suplement</label>
                                     <div class="col-sm-8  control-block">
                                         <asp:DropDownList CssClass="form-control" runat="server" ID="ddlMineralSuppliment" TabIndex="19">
@@ -2585,7 +2672,7 @@ function IBW() {
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-6 col-md-4">
+                                <div class="form-group col-sm-6 col-md-7 mineraldiv">
                                     <label class="col-sm-4 control-label text-right">Mineral Suplement Details</label>
                                     <div class="col-sm-8  control-block">
                                         <asp:TextBox CssClass="form-control" runat="server" ID="txtMineralSuplement" TabIndex="20" autocomplete="off"></asp:TextBox>
@@ -2594,7 +2681,7 @@ function IBW() {
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-6 col-md-4">
+                                <div class="form-group col-sm-6 col-md-5">
                                     <label class="col-sm-4 control-label text-right">Oral Drug</label>
                                     <div class="col-sm-8  control-block">
                                         <asp:DropDownList CssClass="form-control" runat="server" ID="ddlOralDetails" TabIndex="21">
@@ -2604,7 +2691,7 @@ function IBW() {
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-6 col-md-4">
+                                <div class="form-group col-sm-6 col-md-7 oraldiv">
                                     <label class="col-sm-4 control-label text-right">Oral Drug Details </label>
                                     <div class="col-sm-8  control-block">
                                         <asp:TextBox CssClass="form-control" ID="txtOralDrugDetails" runat="server" TabIndex="22" autocomplete="off"></asp:TextBox>
@@ -2633,14 +2720,14 @@ function IBW() {
                                 <div class="form-group col-sm-6 col-md-12 padd">
                                     <div class="col-sm-5 control-block align-center"></div>
                                     <div class="col-sm-2 control-block align-center">
-                                        <asp:Button runat="server" ID="btnGastro" Text="Save" CssClass="btn btn-primary btn-lg btn-block" CausesValidation="true" ValidationGroup="validationGroup5" OnClick="btnGastro_Click" Visible="false" />
+                                        <asp:Button runat="server" ID="btnGastro" Text="Save" CssClass="btn btn-primary btn-lg btn-block display" CausesValidation="true" ValidationGroup="validationGroup5" OnClick="btnGastro_Click" Visible="false" />
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-6 col-md-12 padd">
                                     <div class="col-sm-12 control-block">
                                         <asp:ValidationSummary ID="ValGastro"
                                             DisplayMode="BulletList"
-                                            EnableClientScript="true" ValidationGroup="validationGroup5" runat="server" CssClass="alert alert-danger padd display" />
+                                            EnableClientScript="true" ValidationGroup="validationGroup5" runat="server" CssClass="alert alert-danger padd" />
                                     </div>
                                 </div>
                             </div>
@@ -2742,9 +2829,9 @@ function IBW() {
                                 <div class="form-group col-sm-6 col-md-4">
                                     <label class="col-sm-4 control-label text-right">Sleep Hours Per Day</label>
                                     <div class="col-sm-8  control-block">
-                                        <asp:TextBox CssClass="form-control" runat="server" ID="txtSleep" TabIndex="10" autocomplete="off" PlaceHolder="NN/NN"></asp:TextBox>
+                                        <asp:TextBox CssClass="form-control" runat="server" ID="txtSleep" TabIndex="10" autocomplete="off"></asp:TextBox>
                                         <%--<asp:RequiredFieldValidator CssClass="err-block" ID="RequiredFieldValidator45" runat="server" ErrorMessage="ExerciseDetail  Required" Display="Dynamic" ControlToValidate="txtExerciseDetail" ValidationGroup="validationGroup4" ForeColor="Red" Text="*"></asp:RequiredFieldValidator>--%>
-                                        <asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator42" runat="server" ErrorMessage="Invalid Sleep Details" Display="Dynamic" ControlToValidate="txtSleep" ValidationGroup="validationGroup4" ForeColor="Red" ValidationExpression="^\d{1,2}\/\d{1,2}$"></asp:RegularExpressionValidator>
+                                        <%--<asp:RegularExpressionValidator CssClass="err-block err-bottom" ID="RegularExpressionValidator42" runat="server" ErrorMessage="Invalid Sleep Details" Display="Dynamic" ControlToValidate="txtSleep" ValidationGroup="validationGroup4" ForeColor="Red" ValidationExpression="^\d{1,2}\/\d{1,2}$"></asp:RegularExpressionValidator>--%>
                                     </div>
                                 </div>
 
@@ -3161,12 +3248,12 @@ function IBW() {
                                                     <th style="text-align: left; width: 20%">Food Group</th>
                                                     <th style="width: 70%">Servings</th>
                                                     <%--<th style="width: 10%">Break-fast</th>
-                                                    <th style="width: 10%">Mid-Morning</th>
-                                                    <th style="width: 10%">Lunch</th>
-                                                    <th style="width: 10%">Tea</th>
-                                                    <th style="width: 10%">Snack</th>
-                                                    <th style="width: 10%">Dinner</th>
-                                                    <th style="width: 10%">Bed Time</th>--%>
+													<th style="width: 10%">Mid-Morning</th>
+													<th style="width: 10%">Lunch</th>
+													<th style="width: 10%">Tea</th>
+													<th style="width: 10%">Snack</th>
+													<th style="width: 10%">Dinner</th>
+													<th style="width: 10%">Bed Time</th>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Grains and Cereals</td>
@@ -3175,22 +3262,22 @@ function IBW() {
                                                     </td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtGrain1" Width="82px"></asp:TextBox>
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtGrain8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtGrain1" Width="82px"></asp:TextBox>
+													</td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtGrain8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Dals, Pulses and Legumes</td>
@@ -3198,21 +3285,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtDalsServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtDal1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtDal8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtDal1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtDal8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Milk and Milk Products</td>
@@ -3220,21 +3307,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtMilkServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtMilk1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtMilk8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtMilk1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtMilk8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Non-vegetarian foods</td>
@@ -3242,21 +3329,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtNonvegServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtNonveg8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtNonveg1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtNonveg8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Vegetables</td>
@@ -3264,21 +3351,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtVegetableServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtVegetable8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtVegetable1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtVegetable8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Fruits</td>
@@ -3286,21 +3373,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtFruitsServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtFruits1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFruits8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtFruits1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFruits8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Sugar</td>
@@ -3308,21 +3395,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtSugarServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtSugar1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtSugar8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtSugar1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtSugar8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Fat</td>
@@ -3330,21 +3417,21 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtFatServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtFat1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtFat8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtFat1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtFat8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
                                                     <td style="text-align: left">Water</td>
@@ -3352,24 +3439,24 @@ function IBW() {
                                                         <asp:TextBox runat="server" ID="txtWaterServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
                                                     <%--<td>
-                                                        <asp:TextBox runat="server" ID="txtWater1" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater2" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater3" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater4" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater5" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater6" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater7" Width="82px"></asp:TextBox></td>
-                                                    <td>
-                                                        <asp:TextBox runat="server" ID="txtWater8" Width="82px"></asp:TextBox></td>--%>
+														<asp:TextBox runat="server" ID="txtWater1" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater2" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater3" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater4" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater5" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater6" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater7" Width="82px"></asp:TextBox></td>
+													<td>
+														<asp:TextBox runat="server" ID="txtWater8" Width="82px"></asp:TextBox></td>--%>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: left">Biscuit</td>
+                                                    <td style="text-align: left">Miscellaneous</td>
                                                     <td>
                                                         <asp:TextBox runat="server" ID="txtBiscuitServings" TextMode="MultiLine" Rows="2" CssClass="col-sm-10  control-block"></asp:TextBox></td>
 
@@ -3401,19 +3488,19 @@ function IBW() {
                             </div>
                         </div>--%>
                         <div class="row buttons-row">
-                            <div class="col-sm-12 align-center">                                
-                                <asp:Button runat="server" ID="btnBack" Text="Back" CssClass="btn btn-primary btn-lg" OnClick="btnBack_Click" PostBackUrl="~/Screens/PatientDetails.aspx" CausesValidation="false" />
-                                <%--<asp:Button runat="server" ID="btnSave" Text="Save All" CssClass="btn btn-primary btn-sm" OnClick="btnSave_Click" CausesValidation="true" ValidationGroup="ValidationGroup" />--%>
-                                <asp:Button runat="server" ID="btnUpdate" Text="Save All" CssClass="btn btn-primary btn-lg" OnClick="btnUpdate_Click" CausesValidation="true" ValidationGroup="ValidationGroup" />
+                            <div class="col-sm-12 align-center">
+                                <asp:Button runat="server" ID="btnBack" Text="Back" CssClass="btn btn-primary btn-sm" OnClick="btnBack_Click" PostBackUrl="~/Screens/PatientDetails.aspx" CausesValidation="false" />
+                                <%--           <asp:Button runat="server" ID="btnSave" Text="Save All" CssClass="btn btn-primary btn-sm" OnClick="btnSave_Click" CausesValidation="true" ValidationGroup="ValidationGroup" />--%>
+                                <asp:Button runat="server" ID="btnUpdate" Text="Save All" CssClass="btn btn-primary btn-sm" OnClick="btnUpdate_Click" CausesValidation="true" ValidationGroup="ValidationGroup" />
                                 <%--<span onclick="return confirm('Are you sure you want to delete?')">
-                                        <asp:Button runat="server" ID="btnDelete" Text="Delete" CssClass="btn btn-primary btn-sm" OnClick="btnDelete_Click" CausesValidation="false" /></span>
-                                     <input type="button" id="btnPrint" value="Print" class="btn btn-primary btn-sm" onclick="openPopup();"/>--%>
+                                    <asp:Button runat="server" ID="btnDelete" Text="Delete" CssClass="btn btn-primary btn-sm" OnClick="btnDelete_Click" CausesValidation="false" /></span>--%>
+                                <%-- <input type="button" id="btnPrint" value="Print" class="btn btn-primary btn-sm" onclick="openPopup();"/>--%>
                                 <%-- <span onclick="return confirm('Are you sure you want to print?')">--%>
                                 <%--<asp:Button runat="server" ID="btnPrint" Text="Print" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnPrint_Click" />--%>
                                 <%--</span>--%>
                                 <%--<asp:Button runat="server" ID="btnEnd" Text="End Appointment" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnEnd_Click" />--%>
                                 <%-- <asp:Button runat="server" ID="btnUpload" Text="Upload Documents" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnUpload_Click" />
-                            <asp:Button runat="server" ID="btnHistory" Text="History" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnHistory_Click" />--%>
+							<asp:Button runat="server" ID="btnHistory" Text="History" CssClass="btn btn-primary btn-sm" CausesValidation="false" OnClick="btnHistory_Click" />--%>
                             </div>
                         </div>
                     </div>
@@ -3424,10 +3511,10 @@ function IBW() {
     <asp:UpdateProgress ID="UpdateProgress1" runat="server" AssociatedUpdatePanelID="UpdatePanel1">
         <ProgressTemplate>
             <%--<div class="PkModal">
-                <div class="center">
-                    <img alt="" src="../Images/loader.gif" />
-                </div>
-            </div>--%>
+				<div class="center">
+					<img alt="" src="../Images/loader.gif" />
+				</div>
+			</div>--%>
             <div id="loading">
                 <div class='uil-default-css' style='transform: scale(0.9); background-color: #ffffff; border-radius: 15px;'>
                     <div style='top: 80px; left: 93px; width: 14px; height: 40px; background: #00b2ff; -webkit-transform: rotate(0deg) translate(0,-60px); transform: rotate(0deg) translate(0,-60px); border-radius: 10px; position: absolute;'></div>
@@ -3447,9 +3534,7 @@ function IBW() {
         </ProgressTemplate>
     </asp:UpdateProgress>
 </asp:Content>
-<asp:Content ID="Content3" ContentPlaceHolderID="ContentPlaceHolder2" runat="server">
-</asp:Content>
-<asp:Content ID="Content4" ContentPlaceHolderID="profilecontent" runat="server">
+<asp:Content ID="Content3" ContentPlaceHolderID="profilecontent" runat="server">
     <style>
         .sidebar.responsive.menu-min .cprofiles-block {
             display: none;
@@ -3493,9 +3578,9 @@ function IBW() {
                 <asp:Label ID="lblVisit1" runat="server"></asp:Label>
             </div>
             <br />
-            <%--<div>
+            <%-- <div>
                 <ul class="list-group">
-                    <%-- <li><a href="../Screens/PatientHistory.aspx" class="list-group-item list-group-item-info" target="_blank">Visits</a></li>-
+                    <%-- <li><a href="../Screens/PatientHistory.aspx" class="list-group-item list-group-item-info" target="_blank">Visits</a></li>
                     <%--<li><a href="../Screens/DietPlan.aspx" class="list-group-item list-group-item-info" target="_blank">Recall Diet</a></li>
                     <li><a href="../Screens/PatientDocs.aspx" class="list-group-item list-group-item-info" target="_blank">Upload documents</a></li>
                     <li><a href="../Screens/FigurePlotsOfWeightChange.aspx" class="list-group-item list-group-item-info" target="_blank">Weight change graph</a></li>
@@ -3506,3 +3591,4 @@ function IBW() {
         </div>
     </div>
 </asp:Content>
+

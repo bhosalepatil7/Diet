@@ -92,7 +92,6 @@ D:\Intrepidians\Diet Project\Diet\GNHClientUI\bin\evointernal.dat
 D:\Intrepidians\Diet Project\Diet\GNHClientUI\obj\Debug\GNHClientUI.csprojResolveAssemblyReference.cache
 D:\Intrepidians\Diet Project\Diet\GNHClientUI\obj\Debug\GNHClientUI.dll
 D:\Intrepidians\Diet Project\Diet\GNHClientUI\obj\Debug\GNHClientUI.pdb
-D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\evointernal.dat
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\obj\Debug\GNHClientUI.csprojResolveAssemblyReference.cache
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\GNHClientUI.dll.config
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\GNHClientUI.dll
@@ -110,5 +109,6 @@ D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\Diet.Business.Model.pd
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\Diet.DataAccess.DataManagers.pdb
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\HtmlAgilityPack.pdb
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\HtmlAgilityPack.xml
+D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\bin\evointernal.dat
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\obj\Debug\GNHClientUI.dll
 D:\Intrepidians\Diet Project\Project\Diet\GNHClientUI\obj\Debug\GNHClientUI.pdb

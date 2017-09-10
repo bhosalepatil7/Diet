@@ -97,8 +97,9 @@ function addFoodRow(MealId) {
 
 function clearFoodConsumptionDays(MealId) {
     //clear all week days check boxex
-    $(containerRecallDiet + "input[type='checkbox'][id*='" + MealId + "']").each(function () {
+    $(containerRecallDiet + "input[id^='chkDays" + MealId + "_'],input[id$='chkWeekdays" + MealId + "'],input[id$='chkWeekend" + MealId + "'],input[id$='chkAlldays" + MealId + "']").each(function () {
         $(this).prop("checked", false);
+        $(this).prop("disabled", false);
     });
 }
 
@@ -131,10 +132,15 @@ function setFoodConsumtionDays(MealId, foodConsumtionDaysBits) {
     debugger;
     $(containerRecallDiet + "input[id*='chkDays" + MealId + "_']").each(function (i) {
 
-        if (foodConsumtionDaysBits.substr(i, 1) == "1")
+        if (foodConsumtionDaysBits.substr(i, 1) == "1") {
             $(this).prop('checked', true);
-        else
+            $(this).prop('disabled', false);
+        }
+        else {
             $(this).prop('checked', false);
+            $(this).prop('disabled', true);
+        }
+            
     });
 
     if (foodConsumtionDaysBits == "1111111") {
@@ -142,15 +148,16 @@ function setFoodConsumtionDays(MealId, foodConsumtionDaysBits) {
         $(containerRecallDiet + "input[id$='chkWeekdays" + MealId + "']").prop("checked", true);
         $(containerRecallDiet + "input[id$='chkWeekend" + MealId + "']").prop("checked", true);
     }
-
-
-    if (foodConsumtionDaysBits.substr(0, 5) == "11111") {
+    else if (foodConsumtionDaysBits.substr(0, 5) == "11111") {
         $(containerRecallDiet + "input[id$='chkWeekdays" + MealId + "']").prop("checked", true);
     }
-
-
-    if (foodConsumtionDaysBits.substr(5, 2) == "11") {
+    else if (foodConsumtionDaysBits.substr(5, 2) == "11") {
         $(containerRecallDiet + "input[id$='chkWeekend" + MealId + "']").prop("checked", true);
+    }
+    else {
+        $(containerRecallDiet + "input[id$='chkAlldays" + MealId + "']").prop("checked", false);
+        $(containerRecallDiet + "input[id$='chkWeekdays" + MealId + "']").prop("checked", false);
+        $(containerRecallDiet + "input[id$='chkWeekend" + MealId + "']").prop("checked", false);
     }
 
 }
@@ -466,6 +473,7 @@ function selectRecallDays(ctrl, mealId) {
             //alert('All' + mealId);
             $(containerRecallDiet + "input[id^='chkDays" + mealId + "_']").each(function () {
                 $(this).prop("checked", check);
+                $(this).prop("disabled", false);
             });
 
             $(containerRecallDiet + "input[id$='chkWeekdays" + mealId + "']").prop("checked", check);
@@ -474,39 +482,56 @@ function selectRecallDays(ctrl, mealId) {
 
         case "Weekdays":
             //alert('Weekday' + mealId);
+            debugger;
             $(containerRecallDiet + "input[id^='chkDays" + mealId + "_']").each(function () {
 
                 if (weekDay.indexOf($(this).val()) > -1) {
                     $(this).prop("checked", check);
+                    $(this).prop("disabled", false);
+                }
+
+                //new logic
+                if (weekEnd.indexOf($(this).val()) > -1) {
+                    if (check) $(this).prop("checked", false);
+                    $(this).prop("disabled", check);
                 }
 
             });
 
-            if (check && $(containerRecallDiet + "input[id$='chkWeekend" + mealId + "']").is(':checked')) {
-                $(containerRecallDiet + "input[id$='chkAlldays" + mealId + "']").prop("checked", true);
+            $(containerRecallDiet + "input[id$='chkAlldays" + mealId + "']").prop("checked", false); // Hide all days checkbox this one way
+
+            if (check) {
+                $(containerRecallDiet + "input[id$='chkWeekend" + mealId + "']").prop("checked", false)
             }
-            else {
-                $(containerRecallDiet + "input[id$='chkAlldays" + mealId + "']").prop("checked", false);
-            }
+
 
             break;
 
         case "Weekend":
             //alert('Weekend' + mealId);
+            debugger;
             $(containerRecallDiet + "input[id^='chkDays" + mealId + "_']").each(function () {
 
                 if (weekEnd.indexOf($(this).val()) > -1) {
                     $(this).prop("checked", check);
+                    $(this).prop("disabled", false);
+                }
+
+                //new logic
+                if (weekDay.indexOf($(this).val()) > -1) {
+                    if (check) $(this).prop("checked", false);
+                    $(this).prop("disabled", check);
                 }
             });
 
-            if (check && $(containerRecallDiet + "input[id$='chkWeekdays" + mealId + "']").is(':checked')) {
-                $(containerRecallDiet + "input[id$='chkAlldays" + mealId + "']").prop("checked", true);
-            }
-            else {
-                $(containerRecallDiet + "input[id$='chkAlldays" + mealId + "']").prop("checked", false);
+            $(containerRecallDiet + "input[id$='chkAlldays" + mealId + "']").prop("checked", false); // Hide all days checkbox this one way
+
+            if (check) {
+                $(containerRecallDiet + "input[id$='chkWeekdays" + mealId + "']").prop("checked", false);
             }
 
+
+            break;
 
         default:
             debugger;

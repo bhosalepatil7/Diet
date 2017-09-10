@@ -74,7 +74,7 @@
                     <div class="col-sm-8  control-block">
                         <asp:TextBox runat="server" ID="txtSearch" TabIndex="2" autocomplete="off"></asp:TextBox>&nbsp;&nbsp;&nbsp;
                         <asp:Button runat="server" ID="btnSearch" Text="Search" CssClass="btn btn-primary btn-sm" OnClick="btnSearch_Click" />&nbsp;&nbsp;&nbsp;
-                        <asp:Button runat="server" ID="btnNew" Text="New Client" CssClass="btn btn-primary btn-sm" OnClick="btnNew_Click" />
+                        <%--<asp:Button runat="server" ID="btnNew" Text="New Client" CssClass="btn btn-primary btn-sm" OnClick="btnNew_Click" />--%>
                     </div>
 
                 </div>

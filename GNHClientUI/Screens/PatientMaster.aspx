@@ -19,8 +19,8 @@
     <script src="../assets/js/jquery.maskedinput.js"></script>
     <script src="../assets/js/jquery.addnew.js"></script>
     <script src="../Scripts/gnh-converter.js"></script>
-    <script src="../Scripts/RecallDiet.js?v=2017082705"></script>
-    <script src="../Scripts/RecommendedDiet.js?v=2017082705"></script>
+    <script src="../Scripts/RecallDiet.js?v=2017082805"></script>
+    <script src="../Scripts/RecommendedDiet.js?v=2017082805"></script>
     <style type="text/css">
         .table {
             border-bottom: 0px !important;

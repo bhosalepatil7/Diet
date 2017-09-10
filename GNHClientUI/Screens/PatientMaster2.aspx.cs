@@ -28,6 +28,7 @@ using Spire.Doc.Documents;
 using Spire.Doc.Fields;
 using System.Drawing;
 using System.Web.UI.HtmlControls;
+using PhoneNumbers;
 
 namespace GNHClientUI
 {
@@ -38,16 +39,18 @@ namespace GNHClientUI
         DataSet ds = new DataSet();
         ExportClass obj1 = new ExportClass();
         GNHUtility objUtility = new GNHUtility();
-        int state = 0;
-        int citycode = 0;
+        Int64 state = 0;
+        Int64 citycode = 0;
         CustomerDetailManager cobj;
         AnthropometricsManager aobj;
         BioChemicalManager bobj;
         ComorbidityManager crobj;
         string[] splitString = { "@|@" };
         DataTable dtFoodGroupImages = new DataTable();
+
         protected void Page_Load(object sender, EventArgs e)
         {
+
             Toolkit1.RegisterPostBackControl(btnBack);
             //Toolkit1.RegisterPostBackControl(btnDelete);
             //Toolkit1.RegisterPostBackControl(btnSave);
@@ -110,13 +113,12 @@ namespace GNHClientUI
                 {
                     //btnSave.Enabled = false;
                     btnUpdate.Enabled = true;
-                    // btnDelete.Enabled = true;
+                    //btnDelete.Enabled = true;
                     //btnEnd.Enabled = true;
                     //btnHistory.Enabled = true;
                 }
             }
         }
-
         protected void Page_Error(object sender, EventArgs e)
         {
             String PhyFilePath = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -512,7 +514,7 @@ namespace GNHClientUI
                 else
                     Tell.text("History Added Successfully", this);
                 setUnits();
-                //       Server.Transfer("~/Screens/Client_Dashboard.aspx");
+
                 //Server.Transfer("~/Screens/PatientDetails.aspx");
             }
         }
@@ -562,9 +564,9 @@ namespace GNHClientUI
                 txtLocality.Text = Convert.ToString(ds.Tables[0].Rows[0]["CDsLocality"]);
                 ddlCountries.Items.FindByValue(ds.Tables[0].Rows[0]["CDsCountry"].ToString()).Selected = true;
                 //txtCity.Text = Convert.ToString(ds.Rows[0]["CDsCity"]);
-                state = Convert.ToInt16(ds.Tables[0].Rows[0]["CDsState"]);
-                citycode = Convert.ToInt16(ds.Tables[0].Rows[0]["CDsCity"]);
-                txtPin.Text = Convert.ToString(ds.Tables[0].Rows[0]["CDsPincode"]);
+                state = Convert.ToInt64(ds.Tables[0].Rows[0]["CDsState"]);
+                citycode = Convert.ToInt64(ds.Tables[0].Rows[0]["CDsCity"]);
+                txtPin.Text = Convert.ToString(ds.Tables[0].Rows[0]["CDsPincode"]).Equals("0") ? string.Empty : Convert.ToString(ds.Tables[0].Rows[0]["CDsPincode"]);
                 txtEmail.Text = Convert.ToString(ds.Tables[0].Rows[0]["CDsEmail"]);
                 txtMobile.Text = Convert.ToString(ds.Tables[0].Rows[0]["CDsMobile"]);
                 txtLandline.Text = Convert.ToString(ds.Tables[0].Rows[0]["CDsLandline"]);
@@ -1320,6 +1322,11 @@ namespace GNHClientUI
                 BindDropDownList(ddlStates, query, "State", "StateId", "Select State");
                 ddlStates.Enabled = true;
             }
+
+            //RegularExpressionValidator7.ValidationExpression = Convert.ToString(new HelperMasterDataManager().GetRegexForCountry(Convert.ToInt16(ddlCountries.SelectedValue)).Rows[0][0]);
+            //RegularExpressionValidator62.ValidationExpression = Convert.ToString(new HelperMasterDataManager().GetRegexForCountry(Convert.ToInt16(ddlCountries.SelectedValue)).Rows[0][0]);
+            //lblMob1.Text = Convert.ToString(new HelperMasterDataManager().GetCountryCode(Convert.ToInt16(ddlCountries.SelectedValue)).Rows[0][0]);
+            //lblMob2.Text = Convert.ToString(new HelperMasterDataManager().GetCountryCode(Convert.ToInt16(ddlCountries.SelectedValue)).Rows[0][0]);
         }
 
         protected void State_Changed(object sender, EventArgs e)
@@ -1339,7 +1346,7 @@ namespace GNHClientUI
         protected void bindprofile()
         {
             string conString = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
-            SqlCommand cmd = new SqlCommand("SELECT CDsCustName +' '+ CDsLastName as name,CDnCustAge,case when CDnGender=0 then 'M' else 'F' end as Gender,CONVERT(VARCHAR(12), CDdtDOB, 7) as DOB,CDsAddress1,CDsLocality,CDsLandline ,(select isnull(CONVERT(VARCHAR(12), max(CDdtUpdated), 7),'') from CustomerDetail_Trail t1 where t1.CDnCustomerIDPK=@id) as visit FROM CustomerDetail t where CDnCustomerIDPK=@id");
+            SqlCommand cmd = new SqlCommand("SELECT CDsCustName +' '+ CDsLastName as name,CDnCustAge,case when CDnGender=0 then 'M' else 'F' end as Gender,CONVERT(VARCHAR(12), CDdtDOB, 107) as DOB,CDsAddress1,CDsLocality,CDsMobile ,(select isnull(CONVERT(VARCHAR(12), max(CDdtUpdated), 107),'') from CustomerDetail_Trail t1 where t1.CDnCustomerIDPK=@id) as visit FROM CustomerDetail t where CDnCustomerIDPK=@id");
             cmd.Parameters.AddWithValue("@id", Session["PatientID"].ToString());
             using (SqlConnection con = new SqlConnection(conString))
             {
@@ -1355,7 +1362,7 @@ namespace GNHClientUI
                     lblid.Text = "[" + Session["PatientID"].ToString() + "]";
                     lbldob.Text = Convert.ToString(dt.Rows[0]["DOB"]) + '(' + Convert.ToString(dt.Rows[0]["CDnCustAge"]) + " y) - " + Convert.ToString(dt.Rows[0]["Gender"]);
                     lbladdress.Text = Convert.ToString(dt.Rows[0]["CDsAddress1"]) + "," + Convert.ToString(dt.Rows[0]["CDsLocality"]);
-                    lbllandline.Text = "[" + Convert.ToString(dt.Rows[0]["CDsLandline"]) + "]";
+                    lbllandline.Text = "[" + Convert.ToString(dt.Rows[0]["CDsMobile"]) + "]";
                     lblVisit1.Text = Convert.ToString(dt.Rows[0]["visit"]);
                 }
             }
@@ -1384,6 +1391,8 @@ namespace GNHClientUI
 
         protected void btnDietLifestyle_Click(object sender, EventArgs e)
         {
+            if (!IsGroupValid("validationGroup4")) return;
+
             //System.Threading.Thread.Sleep(3000);
             if (!Convert.ToString(Session["PatientID"]).Equals("0"))
             {
@@ -1425,6 +1434,8 @@ namespace GNHClientUI
         }
         protected void btnClientData_Click(object sender, EventArgs e)
         {
+            if (!IsGroupValid("ValidationGroup")) return;
+
             //System.Threading.Thread.Sleep(3000);
             if (!Convert.ToString(Session["PatientID"]).Equals("0"))
             {
@@ -1457,6 +1468,8 @@ namespace GNHClientUI
         }
         protected void btnComorbidity_Click(object sender, EventArgs e)
         {
+            if (!IsGroupValid("validationGroup5")) return;
+
             //System.Threading.Thread.Sleep(3000);
             if (!Convert.ToString(Session["PatientID"]).Equals("0"))
             {
@@ -1476,6 +1489,8 @@ namespace GNHClientUI
         }
         protected void btnBio_Click(object sender, EventArgs e)
         {
+            if (!IsGroupValid("validationGroup2")) return;
+
             //System.Threading.Thread.Sleep(3000);
             if (!Convert.ToString(Session["PatientID"]).Equals("0"))
             {
@@ -1781,6 +1796,8 @@ namespace GNHClientUI
 
         protected void btnAnthro_Click(object sender, EventArgs e)
         {
+            if (!IsGroupValid("validationGroup1")) return;
+
             //System.Threading.Thread.Sleep(3000);
             if (!Convert.ToString(Session["PatientID"]).Equals("0"))
             {
@@ -1912,6 +1929,299 @@ namespace GNHClientUI
             ddlWeightUnit5.SelectedIndex = 0;
             ddlWeightUnit6.SelectedIndex = 0;
             ddlWeightUnit7.SelectedIndex = 0;
+        }
+
+        protected void MobileNumberValidate(object source, ServerValidateEventArgs args)
+        {
+
+            PhoneNumbers.PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
+
+            // TODO : EXCEPTION HANDLING
+            string countryCode = countryNameToCode(ddlCountries.SelectedItem.Text);
+            if (string.IsNullOrEmpty(countryCode))
+            {
+                args.IsValid = false;
+            }
+            else
+            {
+                PhoneNumber phoneNumber = phoneUtil.Parse(txtMobile.Text, countryCode);
+                bool isValidNumber = phoneUtil.IsValidNumberForRegion(phoneNumber, countryCode);
+                args.IsValid = isValidNumber;
+            }
+        }
+
+        protected void LandlineNumberValidate(object source, ServerValidateEventArgs args)
+        {
+            PhoneNumbers.PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
+
+            // TODO : EXCEPTION HANDLING
+            string countryCode = countryNameToCode(ddlCountries.SelectedItem.Text);
+            if (string.IsNullOrEmpty(countryCode))
+            {
+                args.IsValid = false;
+            }
+            else
+            {
+                PhoneNumber phoneNumber = phoneUtil.Parse(txtLandline.Text, countryCode);
+                bool isValidNumber = phoneUtil.IsValidNumberForRegion(phoneNumber, countryCode);
+                args.IsValid = isValidNumber;
+            }
+        }
+
+        public string countryNameToCode(string countryName)
+        {
+            Dictionary<string, string> arrCountryCode = new Dictionary<string, string>();
+            arrCountryCode["Afghanistan"] = "AF";
+            arrCountryCode["Albania"] = "AL";
+            arrCountryCode["Algeria"] = "DZ";
+            arrCountryCode["American Samoa"] = "AS";
+            arrCountryCode["Andorra"] = "AD";
+            arrCountryCode["Angola"] = "AO";
+            arrCountryCode["Anguilla"] = "AI";
+            arrCountryCode["Antarctica"] = "AQ";
+            arrCountryCode["Antigua And Barbuda"] = "AG";
+            arrCountryCode["Argentina"] = "AR";
+            arrCountryCode["Armenia"] = "AM";
+            arrCountryCode["Aruba"] = "AW";
+            arrCountryCode["Ascension Island"] = "AC";
+            arrCountryCode["Australia"] = "AU";
+            arrCountryCode["Austria"] = "AT";
+            arrCountryCode["Azerbaijan"] = "AZ";
+            arrCountryCode["Bahamas"] = "BS";
+            arrCountryCode["Bahrain"] = "BH";
+            arrCountryCode["Bangladesh"] = "BD";
+            arrCountryCode["Barbados"] = "BB";
+            arrCountryCode["Belarus"] = "BY";
+            arrCountryCode["Belgium"] = "BE";
+            arrCountryCode["Belize"] = "BZ";
+            arrCountryCode["Benin"] = "BJ";
+            arrCountryCode["Bermuda"] = "BM";
+            arrCountryCode["Bhutan"] = "BT";
+            arrCountryCode["Bolivia"] = "BO";
+            arrCountryCode["Bosnia And Herzegovina"] = "BA";
+            arrCountryCode["Botswana"] = "BW";
+            arrCountryCode["Bouvet Island"] = "BV";
+            arrCountryCode["Brazil"] = "BR";
+            arrCountryCode["British Indian Ocean Territory"] = "IO";
+            arrCountryCode["Brunei"] = "BN";
+            arrCountryCode["Bulgaria"] = "BG";
+            arrCountryCode["Burkina Faso"] = "BF";
+            arrCountryCode["Burundi"] = "BI";
+            arrCountryCode["Cambodia"] = "KH";
+            arrCountryCode["Cameroon"] = "CM";
+            arrCountryCode["Canada"] = "CA";
+            arrCountryCode["Cape Verde"] = "CV";
+            arrCountryCode["Cayman Islands"] = "KY";
+            arrCountryCode["Central African Republic"] = "CF";
+            arrCountryCode["Chad"] = "TD";
+            arrCountryCode["Chile"] = "CL";
+            arrCountryCode["China"] = "CN";
+            arrCountryCode["Christmas Island"] = "CX";
+            arrCountryCode["Cocos (Keeling) Islands"] = "CC";
+            arrCountryCode["Columbia"] = "CO";
+            arrCountryCode["Comoros"] = "KM";
+            arrCountryCode["Congo"] = "CG";
+            arrCountryCode["Cook Islands"] = "CK";
+            arrCountryCode["Costa Rica"] = "CR";
+            arrCountryCode["Cote D\"Ivorie (Ivory Coast)"] = "CI";
+            arrCountryCode["Croatia (Hrvatska)"] = "HR";
+            arrCountryCode["Cuba"] = "CU";
+            arrCountryCode["Cyprus"] = "CY";
+            arrCountryCode["Czech Republic"] = "CZ";
+            arrCountryCode["Democratic Republic Of Congo (Zaire)"] = "CD";
+            arrCountryCode["Denmark"] = "DK";
+            arrCountryCode["Djibouti"] = "DJ";
+            arrCountryCode["Dominica"] = "DM";
+            arrCountryCode["Dominican Republic"] = "DO";
+            arrCountryCode["East Timor"] = "TL";
+            arrCountryCode["Ecuador"] = "EC";
+            arrCountryCode["Egypt"] = "EG";
+            arrCountryCode["El Salvador"] = "SV";
+            arrCountryCode["Equatorial Guinea"] = "GQ";
+            arrCountryCode["Eritrea"] = "ER";
+            arrCountryCode["Estonia"] = "EE";
+            arrCountryCode["Ethiopia"] = "ET";
+            arrCountryCode["Falkland Islands (Malvinas)"] = "FK";
+            arrCountryCode["Faroe Islands"] = "FO";
+            arrCountryCode["Fiji"] = "FJ";
+            arrCountryCode["Finland"] = "FI";
+            arrCountryCode["France"] = "FR";
+            arrCountryCode["France, Metropolitan"] = "FX";
+            arrCountryCode["French Guinea"] = "GF";
+            arrCountryCode["French Polynesia"] = "PF";
+            arrCountryCode["French Southern Territories"] = "TF";
+            arrCountryCode["Gabon"] = "GA";
+            arrCountryCode["Gambia"] = "GM";
+            arrCountryCode["Georgia"] = "GE";
+            arrCountryCode["Germany"] = "DE";
+            arrCountryCode["Ghana"] = "GH";
+            arrCountryCode["Gibraltar"] = "GI";
+            arrCountryCode["Greece"] = "GR";
+            arrCountryCode["Greenland"] = "GL";
+            arrCountryCode["Grenada"] = "GD";
+            arrCountryCode["Guadeloupe"] = "GP";
+            arrCountryCode["Guam"] = "GU";
+            arrCountryCode["Guatemala"] = "GT";
+            arrCountryCode["Guinea"] = "GN";
+            arrCountryCode["Guinea-Bissau"] = "GW";
+            arrCountryCode["Guyana"] = "GY";
+            arrCountryCode["Haiti"] = "HT";
+            arrCountryCode["Heard And McDonald Islands"] = "HM";
+            arrCountryCode["Honduras"] = "HN";
+            arrCountryCode["Hong Kong"] = "HK";
+            arrCountryCode["Hong Kong S.A.R."] = "HK";
+            arrCountryCode["Hungary"] = "HU";
+            arrCountryCode["Iceland"] = "IS";
+            arrCountryCode["India"] = "IN";
+            arrCountryCode["Indonesia"] = "ID";
+            arrCountryCode["Iran"] = "IR";
+            arrCountryCode["Iraq"] = "IQ";
+            arrCountryCode["Ireland"] = "IE";
+            arrCountryCode["Isle of Man"] = "IM";
+            arrCountryCode["Israel"] = "IL";
+            arrCountryCode["Italy"] = "IT";
+            arrCountryCode["Jamaica"] = "JM";
+            arrCountryCode["Japan"] = "JP";
+            arrCountryCode["Jordan"] = "JO";
+            arrCountryCode["Kazakhstan"] = "KZ";
+            arrCountryCode["Kenya"] = "KE";
+            arrCountryCode["Kiribati"] = "KI";
+            arrCountryCode["Kuwait"] = "KW";
+            arrCountryCode["Kyrgyzstan"] = "KG";
+            arrCountryCode["Laos"] = "LA";
+            arrCountryCode["Latvia"] = "LV";
+            arrCountryCode["Lebanon"] = "LB";
+            arrCountryCode["Lesotho"] = "LS";
+            arrCountryCode["Liberia"] = "LR";
+            arrCountryCode["Libya"] = "LY";
+            arrCountryCode["Liechtenstein"] = "LI";
+            arrCountryCode["Lithuania"] = "LT";
+            arrCountryCode["Luxembourg"] = "LU";
+            arrCountryCode["Macau"] = "MO";
+            arrCountryCode["Macedonia"] = "MK";
+            arrCountryCode["Madagascar"] = "MG";
+            arrCountryCode["Malawi"] = "MW";
+            arrCountryCode["Malaysia"] = "MY";
+            arrCountryCode["Maldives"] = "MV";
+            arrCountryCode["Mali"] = "ML";
+            arrCountryCode["Malta"] = "MT";
+            arrCountryCode["Marshall Islands"] = "MH";
+            arrCountryCode["Martinique"] = "MQ";
+            arrCountryCode["Mauritania"] = "MR";
+            arrCountryCode["Mauritius"] = "MU";
+            arrCountryCode["Mayotte"] = "YT";
+            arrCountryCode["Mexico"] = "MX";
+            arrCountryCode["Micronesia"] = "FM";
+            arrCountryCode["Moldova"] = "MD";
+            arrCountryCode["Monaco"] = "MC";
+            arrCountryCode["Mongolia"] = "MN";
+            arrCountryCode["Montenegro"] = "ME";
+            arrCountryCode["Montserrat"] = "MS";
+            arrCountryCode["Morocco"] = "MA";
+            arrCountryCode["Mozambique"] = "MZ";
+            arrCountryCode["Myanmar (Burma)"] = "MM";
+            arrCountryCode["Namibia"] = "NA";
+            arrCountryCode["Nauru"] = "NR";
+            arrCountryCode["Nepal"] = "NP";
+            arrCountryCode["Netherlands"] = "NL";
+            arrCountryCode["Netherlands Antilles"] = "AN";
+            arrCountryCode["New Caledonia"] = "NC";
+            arrCountryCode["New Zealand"] = "NZ";
+            arrCountryCode["Nicaragua"] = "NI";
+            arrCountryCode["Niger"] = "NE";
+            arrCountryCode["Nigeria"] = "NG";
+            arrCountryCode["Niue"] = "NU";
+            arrCountryCode["Norfolk Island"] = "NF";
+            arrCountryCode["North Korea"] = "KP";
+            arrCountryCode["Northern Mariana Islands"] = "MP";
+            arrCountryCode["Norway"] = "NO";
+            arrCountryCode["Oman"] = "OM";
+            arrCountryCode["Pakistan"] = "PK";
+            arrCountryCode["Palau"] = "PW";
+            arrCountryCode["Palestine"] = "PS";
+            arrCountryCode["Panama"] = "PA";
+            arrCountryCode["Papua New Guinea"] = "PG";
+            arrCountryCode["Paraguay"] = "PY";
+            arrCountryCode["Peru"] = "PE";
+            arrCountryCode["Philippines"] = "PH";
+            arrCountryCode["Pitcairn"] = "PN";
+            arrCountryCode["Poland"] = "PL";
+            arrCountryCode["Portugal"] = "PT";
+            arrCountryCode["Puerto Rico"] = "PR";
+            arrCountryCode["Qatar"] = "QA";
+            arrCountryCode["Reunion"] = "RE";
+            arrCountryCode["Romania"] = "RO";
+            arrCountryCode["Russia"] = "RU";
+            arrCountryCode["Rwanda"] = "RW";
+            arrCountryCode["Saint Helena"] = "SH";
+            arrCountryCode["Saint Kitts And Nevis"] = "KN";
+            arrCountryCode["Saint Lucia"] = "LC";
+            arrCountryCode["Saint Pierre And Miquelon"] = "PM";
+            arrCountryCode["Saint Vincent And The Grenadines"] = "VC";
+            arrCountryCode["San Marino"] = "SM";
+            arrCountryCode["Sao Tome And Principe"] = "ST";
+            arrCountryCode["Saudi Arabia"] = "SA";
+            arrCountryCode["Senegal"] = "SN";
+            arrCountryCode["Serbia"] = "RS";
+            arrCountryCode["Seychelles"] = "SC";
+            arrCountryCode["Sierra Leone"] = "SL";
+            arrCountryCode["Singapore"] = "SG";
+            arrCountryCode["Slovak Republic"] = "SK";
+            arrCountryCode["Slovenia"] = "SI";
+            arrCountryCode["Solomon Islands"] = "SB";
+            arrCountryCode["Somalia"] = "SO";
+            arrCountryCode["South Africa"] = "ZA";
+            arrCountryCode["South Georgia And South Sandwich Islan"] = "GS";
+            arrCountryCode["South Korea"] = "KR";
+            arrCountryCode["Spain"] = "ES";
+            arrCountryCode["Sri Lanka"] = "LK";
+            arrCountryCode["Sudan"] = "SD";
+            arrCountryCode["Suriname"] = "SR";
+            arrCountryCode["Svalbard And Jan Mayen"] = "SJ";
+            arrCountryCode["Swaziland"] = "SZ";
+            arrCountryCode["Sweden"] = "SE";
+            arrCountryCode["Switzerland"] = "CH";
+            arrCountryCode["Syria"] = "SY";
+            arrCountryCode["Taiwan"] = "TW";
+            arrCountryCode["Tajikistan"] = "TJ";
+            arrCountryCode["Tanzania"] = "TZ";
+            arrCountryCode["Thailand"] = "TH";
+            arrCountryCode["Togo"] = "TG";
+            arrCountryCode["Tokelau"] = "TK";
+            arrCountryCode["Tonga"] = "TO";
+            arrCountryCode["Trinidad And Tobago"] = "TT";
+            arrCountryCode["Tunisia"] = "TN";
+            arrCountryCode["Turkey"] = "TR";
+            arrCountryCode["Turkmenistan"] = "TM";
+            arrCountryCode["Turks And Caicos Islands"] = "TC";
+            arrCountryCode["Tuvalu"] = "TV";
+            arrCountryCode["Uganda"] = "UG";
+            arrCountryCode["Ukraine"] = "UA";
+            arrCountryCode["United Arab Emirates"] = "AE";
+            arrCountryCode["United Kingdom"] = "GB";
+            arrCountryCode["United States"] = "US";
+            arrCountryCode["United States Minor Outlying Islands"] = "UM";
+            arrCountryCode["Uruguay"] = "UY";
+            arrCountryCode["Uzbekistan"] = "UZ";
+            arrCountryCode["Vanuatu"] = "VU";
+            arrCountryCode["Vatican City (Holy See)"] = "VA";
+            arrCountryCode["Venezuela"] = "VE";
+            arrCountryCode["Vietnam"] = "VN";
+            arrCountryCode["Virgin Islands (British)"] = "VG";
+            arrCountryCode["Virgin Islands (US)"] = "VI";
+            arrCountryCode["Wallis And Futuna Islands"] = "WF";
+            arrCountryCode["Western Sahara"] = "EH";
+            arrCountryCode["Western Samoa"] = "WS";
+            arrCountryCode["Yemen"] = "YE";
+            arrCountryCode["Yugoslavia"] = "YU";
+            arrCountryCode["Zambia"] = "ZM";
+            arrCountryCode["Zimbabwe"] = "ZW";
+
+            // TODO : Do we need to store country name in array while storing? I think we don"t need it
+            // that"s why removing this code -- countryName.toUpperCase()
+            string code = "";
+            arrCountryCode.TryGetValue(countryName, out code);
+            return code;
         }
     }
 }

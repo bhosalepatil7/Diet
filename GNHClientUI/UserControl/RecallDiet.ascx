@@ -376,7 +376,7 @@
 <script src="../assets/js/ace/elements.typeahead.js"></script>
 <script src="../Scripts/notify.min.js"></script>
 <!-- inline scripts related to this page -->
-<script src="../Scripts/RecallDiet.js?v=2017082705"></script>
+<script src="../Scripts/RecallDiet.js?v=2017082805"></script>
 <script>
     $(document).ready(function () {
         setDietRecallType();

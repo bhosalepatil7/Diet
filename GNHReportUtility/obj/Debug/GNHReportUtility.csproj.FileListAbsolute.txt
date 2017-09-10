@@ -13,5 +13,6 @@ D:\Intrepidians\Diet Project\Diet\GNHReportUtility\obj\Debug\GNHReportUtility.pd
 D:\Intrepidians\Diet Project\Project\Diet\GNHReportUtility\bin\Debug\GNHReportUtility.exe.config
 D:\Intrepidians\Diet Project\Project\Diet\GNHReportUtility\bin\Debug\GNHReportUtility.exe
 D:\Intrepidians\Diet Project\Project\Diet\GNHReportUtility\bin\Debug\GNHReportUtility.pdb
+D:\Intrepidians\Diet Project\Project\Diet\GNHReportUtility\obj\Debug\GNHReportUtility.csprojResolveAssemblyReference.cache
 D:\Intrepidians\Diet Project\Project\Diet\GNHReportUtility\obj\Debug\GNHReportUtility.exe
 D:\Intrepidians\Diet Project\Project\Diet\GNHReportUtility\obj\Debug\GNHReportUtility.pdb
