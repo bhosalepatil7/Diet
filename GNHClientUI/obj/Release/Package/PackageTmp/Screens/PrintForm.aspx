@@ -34,7 +34,17 @@
             });
             $(<%=btnPrint.ClientID%>).click(function () {
 
-            })
+            });
+
+            var session = '<%= Session["UserCode"] %>';
+            if (session.toUpperCase() == "GDHARMATTI") {
+                $("#imgLogo").css('opacity', '1');
+                $("#lblRightNutritionForHealth").css('opacity', '1');
+            }
+            else {
+                $("#imgLogo").css('opacity', '0');
+                $("#lblRightNutritionForHealth").css('opacity', '0');
+            }
         });
 
         function ManageEditableContents(varManageTag) {
@@ -76,11 +86,11 @@
                 <tr>
                     <td rowspan="2">
                         <%--<img src="../Images/Logo.jpg" style="height: 76px" />--%>
-                        <img src="../../Images/Logo.jpg" style="height: 76px; left: 35%; text-align: left" />
+                        <img src="../../Images/Logo.jpg" style="height: 76px; left: 35%; text-align: left" id="imgLogo" />
                     </td>
                     <td>
-                        <%--<span id='lbl' style='color:Lime;font-family:Calibri;font-size:XX-Large;font-weight:bold;'>Right Nutrition for Health</span>--%>
-                        <span id='lbl' style='color: #0b6b3b; font-family: Impact; font-size: 40px; font-size: x-large; /* font-weight: bold; */'>Right Nutrition for Health</span>
+                        <%--<span id='lbl' style='color:Lime;font-family:Calibri;font-size:XX-Large;font-weight:bold;'>Right Nutrition for Health</span>--%>                        
+                        <span id='lblRightNutritionForHealth' style='color: #0b6b3b; font-family: Impact; font-size: 40px; font-size: x-large; /* font-weight: bold; */'>Right Nutrition for Health</span>
                     </td>
                 </tr>
                 <tr>

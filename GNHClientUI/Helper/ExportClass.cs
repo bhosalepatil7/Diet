@@ -36,12 +36,12 @@ namespace GNHClientUI.Helper
             strBody.Append(".second{}");
             strBody.Append(".mcomplaint{line-height:22px;}");
             strBody.Append(".thead{background-color:darkred;color:floralwhite;}");
-            strBody.Append(".rowcontent{}");
+            strBody.Append(".rowcontent{text-align: left;}");
             strBody.Append(".firstu{width:350px; text-align:start; font-weight:700; }");
             strBody.Append(".secondu{}");
             strBody.Append(".middleu{}");
             // strBody.Append("<link rel='stylesheet' type='text/css' href ='mystyle.css'>");
-            strBody.Append("</style>");
+            strBody.Append("@media print {.page-break  { display: block; page-break-before: always; }} table {font-family: Calibri; font-size: 18px; font-size: x-medium } @media print {thead {display: table-header-group;}}</style>");
 
             strBody.Append("</head>");
             //strBody.Append("<h3 align='center' color='black'>PH_CLINIC</h3>");
@@ -49,62 +49,62 @@ namespace GNHClientUI.Helper
 
             //Client Info
             strBody.Append("<table cellspacing='0px' border='1'><tr><td colspan='2' align='right'>Date : " + DateTime.UtcNow.AddHours(5.5).ToString("dd-MMM-yyyy") + "</td></tr>");
-            strBody.Append("<tr><td class='first'  align='left'>Name  ");
-            strBody.Append("<td class='second'>"+objDietMaster.CustomerName + " " + objDietMaster.MiddleName + " " + objDietMaster.LastName + "</td></tr>");
-            strBody.Append("<tr><td class='first' align='left'>ID  ");
+            strBody.Append("<tr><td class='first'  align='left'>Name  </td>");
+            strBody.Append("<td class='second'>" + objDietMaster.CustomerName + " " + objDietMaster.MiddleName + " " + objDietMaster.LastName + "</td></tr>");
+            strBody.Append("<tr><td class='first' align='left'>ID  </td>");
             strBody.Append("<td class='second'>" + objDietMaster.CustomerID + "</td></tr>");
 
             if (!string.IsNullOrEmpty(objDietMaster.CustomerAge.ToString()))
             {
-                strBody.Append("<tr><td class='first' align='left'>Age  ");
+                strBody.Append("<tr><td class='first' align='left'>Age  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.CustomerAge + "</td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.MeasuredWeight.ToString()) && !objDietMaster.MeasuredWeight.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td  class='first' align='left'>Wt.  ");
+                strBody.Append("<tr><td  class='first' align='left'>Wt.  </td>");
                 strBody.Append("<td class='second' >" + objDietMaster.MeasuredWeight + " kg</td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.MeasuredHeight.ToString()) && !objDietMaster.MeasuredHeight.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td class='first' align='left'>Ht.  ");
+                strBody.Append("<tr><td class='first' align='left'>Ht.  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.MeasuredHeight * 100 + " Cm</td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.CalculatedBMI.ToString()) && !objDietMaster.CalculatedBMI.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td class='first' align='left'>BMI  ");
+                strBody.Append("<tr><td class='first' align='left'>BMI  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.CalculatedBMI + " kg/m<sup>2</sup></td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.FatPer.ToString()) && !objDietMaster.FatPer.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td class='first' align='left'>Fat %  ");
+                strBody.Append("<tr><td class='first' align='left'>Fat %  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.FatPer + " %</td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.MussleMass.ToString()) && !objDietMaster.MussleMass.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td class='first' align='left'>Mussle Mass  ");
+                strBody.Append("<tr><td class='first' align='left'>Mussle Mass  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.MussleMass + " Kg</td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.IdealBodyWeight.ToString()) && !objDietMaster.IdealBodyWeight.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td class='first' align='left'>Ideal Body Weight.  ");
+                strBody.Append("<tr><td class='first' align='left'>Ideal Body Weight.  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.IdealBodyWeight + " kg</td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.MeasuredWaist.ToString()) && !objDietMaster.MeasuredWaist.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td class='first' align='left'>Waist Circumference  ");
+                strBody.Append("<tr><td class='first' align='left'>Waist Circumference  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.MeasuredWaist * 100 + " Cm (Normal Range:Male-94 Cm ,Female-80 Cm)</td></tr>");
             }
 
             if (!string.IsNullOrEmpty(objDietMaster.VisceralFat.ToString()) && !objDietMaster.VisceralFat.ToString().Equals("0"))
             {
-                strBody.Append("<tr><td  class='first'colspan=4 align='left'>Visceral Fat  ");
+                strBody.Append("<tr><td  class='first' align='left'>Visceral Fat </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.VisceralFat + " </td></tr>");
             }
             if (!string.IsNullOrEmpty(objDietMaster.AnthrpometricsNotes.ToString()))
             {
-                strBody.Append("<tr><td class='first' align='left'>Remark  ");
+                strBody.Append("<tr><td class='first' align='left'>Remark  </td>");
                 strBody.Append("<td class='second'>" + objDietMaster.AnthrpometricsNotes.Replace("\n", "<br/>") + " </td></tr>");
-            }  
+            }
 
             strBody.Append("</table><br/>");
 
@@ -250,7 +250,7 @@ namespace GNHClientUI.Helper
             if (objDietMaster.Thyroid.ToString().ToUpper() == "YES")
                 strBody.Append("<li>control " + objDietMaster.ThyroidType.ToString() + " through Medical management and MNT</li>");
             strBody.Append("</td></tr></table>");
-            strBody.Append("<table width=100%><tr><td class='thead'><b>Other Nutrients :</b></td></tr><tr><td class='rowcontent'>Balanced Nutrients as per Recommended Dietary Allowances </td></tr></table><br/><br/>");
+            strBody.Append("<table width=100%><tr><td class='thead'><b> &nbsp;Other Nutrients :</b></td></tr><tr><td class='rowcontent'>Balanced Nutrients as per Recommended Dietary Allowances </td></tr></table><br/><br/>");
             //strBody.Append("<table width=100%><tr><td><b>Diet Recall </b></td></tr></table>");
 
             DataTable dtFoodListWithID = new DataTable();
@@ -275,8 +275,8 @@ namespace GNHClientUI.Helper
             if (!string.IsNullOrEmpty(objDietMaster.GrainsServings) || !string.IsNullOrEmpty(objDietMaster.DalsServings) || !string.IsNullOrEmpty(objDietMaster.MilkServings) || !string.IsNullOrEmpty(objDietMaster.NonvegServings) || !string.IsNullOrEmpty(objDietMaster.VegetablesServings)
                 || !string.IsNullOrEmpty(objDietMaster.FruitsServings) || !string.IsNullOrEmpty(objDietMaster.SugarServings) || !string.IsNullOrEmpty(objDietMaster.WaterServings) || !string.IsNullOrEmpty(objDietMaster.BiscuitServings))
             {
-                strBody.Append("<table width=90%><tr><td class='thead'><b>Dietary allowance recommended / day:</b></td></tr></table>");
-                strBody.Append("<table width=90% border=1 cellspacing='0px' style='border-collapse: collapse;margin-top: 20px;' bordercolor='black'><tr><th style='text-align: center' width='30%' bgcolor='darksalmon'>Food Group</th><th style='text-align: center' width='70%' bgcolor='darksalmon' line-height='20px'>Servings</th>");
+                strBody.Append("<p style='page-break-before: always;'>&nbsp;</p><table width='90%'><tbody><tr><td><b>Dietary allowance recommended / day:</b></td></tr></tbody></table>");
+                strBody.Append("<table border='1' width='90%' style='border-collapse: collapse;margin-top: 20px;' bordercolor='black'><thead><tr><th style='text-align: center' width='30%'>Food Group</th><th style='text-align: center' width='70%'>Servings</th></tr></thead>");
                 //<th style='text-align: center'>Images</th></tr>");
                 strBody.Append("<tr><td class='firstu'>Grains and Cereals</td>");
                 strBody.Append("<td class='secondu'><p contenteditable='true'>" + (string.IsNullOrEmpty(objDietMaster.GrainsServings) ? dtFoodGroupImages.AsEnumerable().Where(x => Convert.ToString(x["FGsGroupName"]).ToUpper().Equals("GRAINS AND CEREALS")).First().Field<string>("FGsDefaultText") : objDietMaster.GrainsServings).Replace("\n", "<br/>") + "</p></td>");
@@ -355,20 +355,20 @@ namespace GNHClientUI.Helper
             strBody.Append("<table width=90% border='1' cellspacing='0px'><tr><td class='thead'><b>Meal Plan</b></td></tr></table><br/>");
             //strBody.Append("<table width=90%><tr><td>You are recommended to follow a <b>CALORIE_TOTAL</b> Calorie diet plan to reach the desired weight.");
             //strBody.Append("Here is sample menu options to help you understand your diet.</td></tr></table><br/><br/><br/>");
-            strBody.Append("<table border='1' cellspacing='0px' width=90% style='border-collapse: collapse;' bordercolor='black'><tr><td align=center width='10%' bgcolor='darksalmon' ><b>Time</b></td><td align=center width='30%' bgcolor='darksalmon'><b>Exchange</b></td><td align=center width='60%' bgcolor='darksalmon'><b>Diet Chart</b></td></tr>");
+            strBody.Append("<table border='1' width='90%' style='border-collapse: collapse;margin-top: 20px;' bordercolor='black'><thead><tr><th align=center width='10%' bgcolor='darksalmon' ><b>Time</b></th><th align=center width='30%' bgcolor='darksalmon'><b>Exchange</b></th><th align=center width='60%' bgcolor='darksalmon'><b>Diet Chart</b></th></tr></thead>");
             DataTable dtRecommendedDietDetail = new DataTable();
-           
+
             dtRecommendedDietDetail = new RecommendedDietManager().GetRecommendedDietDetails(custID);
-           
+
             List<RecommendedDietDetails> lstRecommendedDietDetails = new List<RecommendedDietDetails>();
             foreach (DataRow drRecommendedDiet in dtRecommendedDietDetail.Rows)
             {
-                     
+
                 RecommendedDietDetails objRecommendedDietDetails = new RecommendedDietDetails();
                 objRecommendedDietDetails.CustomerID = custID;
                 objRecommendedDietDetails.VisitDate = Convert.ToDateTime(drRecommendedDiet["VisitDate"]);
                 objRecommendedDietDetails.Notes = Convert.ToString(drRecommendedDiet["Notes"]);
-                
+
                 List<MealDetails> lstMealDetails = new List<MealDetails>();
                 for (int mealID = 1; mealID <= 12; mealID++)
                 {
@@ -422,7 +422,7 @@ namespace GNHClientUI.Helper
             strBody.Append("</table><br/><br/>");
             //}
 
-            strBody.Append("<table width=90% border='1' cellspacing='0px' ><tr><td class='thead'><b>Things to Remember :</b></td></tr></table>");
+            strBody.Append("<p style='page-break-before: always;'>&nbsp;</p><table><tbody><tr><td><b>Things to Remember :</b></td></tr></tbody></table>");
             strBody.Append("<div id='ThingsRemember'><table width=90% border='1' cellspacing='0px'><tr><td class='rowcontent'><ol contenteditable='true'><li>Suspected food allergens are dairy, soy, gluten.(you need to be cautious with these foods.) eat small meals if it doesn't  bother you can increase the intake</li>");
             strBody.Append("<li>Take adequate rest</li><li>Drink water</li><li>If you feel muscle spasms  include calcium supplement's/ and monitor vitamin D and B12</li><li>Exercise:  walk/swim 45 minutes /daily</li></td></tr></table></div>");
             strBody.Append("<table width=90% border='1' cellspacing='0px'><tr><td class='thead'><b>Supplements Advised:</b></td></tr><tr><td class='firstu'> <p id='pgSupplements' onblur='return ManageEditableContents();' contenteditable='true'>Nil{SUPPLEMENTS}</p><br/></td></tr></table>");
@@ -430,7 +430,7 @@ namespace GNHClientUI.Helper
             strBody.Append("<table width=90% border='1' cellspacing='0px'><tr><td class='thead'><b>Follow up date :</b></td></tr><tr><td class='firstu'><p contenteditable='true'>After 15 days with weight and improvement symptoms.</p></td></tr></table><br/><br/>");
             strBody.Append("<table width=90% border='1' cellspacing='0px'><tr><td>PH_USER</td></tr><tr><td>Consultant Nutritionist & Registered Dietician</td></tr><tr><td class='firstu'>PH_CLINIC</td></tr><tr><td class='firstu'><p contenteditable='true'>Mob No:&nbsp;PH_MOB</p><br/><br/></td></tr></table>");
             strBody.Append("</div>");
-            strBody.Append("</div>"); 
+            strBody.Append("</div>");
             //</body></html>");
             //strBody.Replace("CALORIE_TOTAL", Convert.ToString(CalorieTotal) + " (g)");
             //strBody.Replace("PROTEIN_TOTAL", Convert.ToString(ProteinTotal) + " (kcal)");
